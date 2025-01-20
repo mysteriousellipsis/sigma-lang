@@ -1,4 +1,5 @@
 from typing import List, Any
+import varhandlers as var
 import vars
 import const
 import re
@@ -39,11 +40,6 @@ def recvlineshandler(tokens):
         return None
 
 
-def newvarhandler(tokens):
-    # TODO
-    pass
-
-
 def parseline(line: str) -> Any:
     # remove comments from line
     line = re.sub(f"{const.COMMENT_OPEN}.*?{const.COMMENT_CLOSE}", "", line)
@@ -54,7 +50,7 @@ def parseline(line: str) -> Any:
     tokens = tokenize(line)
 
     if tokens[0] == const.NEW_VAR_IDENT:
-        return newvarhandler(tokens)
+        return var.newvarhandler(tokens)
 
     if tokens[0] == const.INPUT:
         return recvlineshandler(tokens)
