@@ -1,4 +1,4 @@
-# if statements
+# conditionals
 
 ```bash
 if <statement> then do
@@ -52,7 +52,7 @@ while condition do
 elihw
 ```
 
-# conditionals
+# logic
 
 greater than or equal to
 ```bash
@@ -90,4 +90,15 @@ not equals to
 <statement> is not <statement>
 ```
 
+# receiving input
+input
+```bash
+receive
+receive 2 lines
+```
 
+# printing
+print
+```bash
+print 
+```
