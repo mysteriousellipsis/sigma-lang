@@ -1,3 +1,6 @@
+# file structure
+file extension .sl or file has `!>simplelang` as the first line
+
 # conditionals
 
 ```bash
@@ -12,6 +15,7 @@ fi
 ```
 
 # variable assignment
+variables can be stored in variables.json or as a dictionary
 ```bash
 new variable <type> <name> is <expression>
 new constant <type> <name> is <expression>
@@ -20,7 +24,9 @@ new variable <type> <name>
 
 variable is interchangable with var
 constant is interchangable with constant
-type inference?
+type inference in the future mayhaps
+
+
 
 #data types
 integer: whole numbers
@@ -101,4 +107,5 @@ receive 2 lines
 print
 ```bash
 print 
+print line
 ```

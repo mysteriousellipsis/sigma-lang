@@ -1,4 +1,11 @@
-# keywords
+# important ntihngs
+FILE_IDENT = "!>simplelang"
+
+# comments
+COMMENT_OPEN = "<--"
+COMMENT_CLOSE = "-->"
+
+# if statements
 ELIF = "else if"
 IF_OPEN = "if"
 THEN = "then"
@@ -7,10 +14,12 @@ IF_CLOSE = "fi"
 START_EXECUTING = "do"
 
 # assignment
-NEW_VAR = "new"
+NEW_VAR_IDENT = "new"
 CONST_TYPES = ["const", "constant"]
 VAR_TYPES = ["variable", "var"]
 ASSIGNMENT_OPERATOR = "is"
+REASSIGNMENT_IDENT = "change"
+REASSIGNMENT_TO = "to"
 
 # logic 
 EQUALS = "is equal to"
@@ -22,7 +31,9 @@ NOT = "is not"
 
 # i/o
 INPUT = "receive"
+INPUT_TO = "to"
 OUTPUT = "print"
+OUTPUT_NEWLINE = "line"
 
 # loops
 WHILE_OPEN = "while"
