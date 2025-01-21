@@ -1,10 +1,6 @@
 import const
 import sys
-import shell
 import parser
-import varhandler as vars
-
-args = sys.argv[1:]
 
 def mainloop(filename: str) -> int | str:
     with open(filename, "r") as file:
@@ -20,25 +16,23 @@ def mainloop(filename: str) -> int | str:
             raise RuntimeError("file does not have identifier !>sigma")
         raise RuntimeError("wrong file extension... rename your files to <filename>.sl then try again!")
     
+    executionstack = []
     idx = 0
+    
     while idx < len(lines):
         line = lines[idx]
+        result, idx = parser.parseline(line, idx, executionstack)
         
-        # runs parseline
-        result = parser.parseline(line)
+        if result is not None and (not executionstack or executionstack[-1]):
+            if result == "break":
+                break
+            elif result == "continue":
+                continue
+            else:
+                print(f"{result}")
 
-        # if there is an if block
-        if result == const.IF_OPEN:
-            idx = parser.parseif(lines, idx)
 
-        elif result == const.WHILE_OPEN:
-            idx = parser.parsewhile(lines, idx)
-
-        elif result == const.FOR_OPEN:
-            idx = parser.parsefor(lines, idx)
-
-        idx += 1
-
+args = sys.argv[1:]
 
 if len(args) == 0:
     # shell mode soon?

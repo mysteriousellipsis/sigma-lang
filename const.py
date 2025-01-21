@@ -29,6 +29,16 @@ LTE = "is less than or equal to"
 GREATER = "is greater than"
 LESS = "is less than"
 NOT = "is not"
+LOGICAL_AND = "and"
+LOGICAL_OR = "or"
+LOGICAL_NOT = "not"
+
+# flow control
+BREAK = "break"
+CONTINUE = "continue"
+PASS = "pass"
+GOTO = "goto"
+LABEL = "label"
 
 # i/o
 INPUT = "receive"
