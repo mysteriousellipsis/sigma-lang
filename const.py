@@ -5,7 +5,7 @@ FILE_IDENT = "!>sigma"
 COMMENT_OPEN = "<--"
 COMMENT_CLOSE = "-->"
 
-# if statements
+# conditionals
 ELIF = "else if"
 IF_OPEN = "if"
 THEN = "then"

@@ -62,38 +62,33 @@ elihw
 
 # logic
 
-greater than or equal to
+greater than or equal to (>=)
 ```bash
 <statement> is greater than or equal to <statement>
 ```
 
-less than or equal to
+less than or equal to (<=)
 ```bash
 <statemnet> is less than or equal to <statement>
 ```
 
-equals to
+equals to (==)
 
 ```bash
 <statement> is equal to <statement>
 ```
 
-greater than
+greater than (>)
 ```bash
 <statement> is greater than <statement>
 ```
 
-equal to
-```bash
-<statement> is equal to <statement>
-```
-
-less than
+less than (<)
 ```bash
 <statement> is less than <statement>
 ```
 
-not equals to
+not equals to (!=)
 ```bash
 <statement> is not <statement>
 ```
