@@ -7,10 +7,11 @@ it tries to be very simple to understand and learn, especially for absolute begi
 
 # progress on stuff
 ## impremented
-input output (a bit broken)  
+input output  
 variables  
 
 ## in progress
+require "" for string variables
 conditionals  
 while loops  
 for loops  
