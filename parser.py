@@ -1,19 +1,11 @@
 from typing import List, Any
 import varhandlers as var
-import vars
 import const
 import re
 
 
 def tokenize(statement: str) -> List:
     return statement.split()
-
-
-def evaluate(exp: str) -> str:
-    try:
-        return eval(exp, {}, vars.variables)
-    except Exception as e:
-        raise RuntimeError(f"error evaluating {exp}: {e}")
 
 
 def printlinehandler(tokens):
@@ -26,18 +18,19 @@ def printlinehandler(tokens):
         print(f"{tokens[1:]}")
         
 
-def recvlineshandler(tokens):
+def recvlineshandler(tokens) -> str:
     # input to variable
     if (
         len(tokens) == 3
         and tokens[1] == const.INPUT_TO
         and tokens[3] in set(vars.variables.keys())
     ):
-        vars.variables[tokens[3]] = input()
+        
+        usrinput = input()
+        vars.variables[tokens[3]] = usrinput
 
-    # input
-    else:
-        return None
+    return usrinput
+
 
 
 def parseline(line: str) -> Any:
@@ -48,6 +41,9 @@ def parseline(line: str) -> Any:
         return None
 
     tokens = tokenize(line)
+
+    if tokens[0] == const.REASSIGNMENT_IDENT:
+        return var.reassignhandler(tokens)
 
     if tokens[0] == const.NEW_VAR_IDENT:
         return var.newvarhandler(tokens)

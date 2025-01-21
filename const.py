@@ -1,5 +1,5 @@
 # important ntihngs
-FILE_IDENT = "!>simplelang"
+FILE_IDENT = "!>sigma"
 
 # comments
 COMMENT_OPEN = "<--"
@@ -19,7 +19,8 @@ CONST_TYPES = ["const", "constant"]
 VAR_TYPES = ["variable", "var"]
 ASSIGNMENT_OPERATOR = "is"
 REASSIGNMENT_IDENT = "change"
-REASSIGNMENT_TO = "to"
+REASSIGNMENT_OPERATOR = "to"
+
 
 # logic 
 EQUALS = "is equal to"
@@ -43,10 +44,13 @@ FOR_CLOSE = "rof"
 IN = "in"
 
 # vartypes
-INTEGER = ["integer", "int"]
+INTEGER = "int"
 FLOAT = "float"
-BOOL = ["true", "false", "True", "False"]
-NONETYPE = ["None", "none", "Nothing", "nothing"]
+BOOL = "bool"
+NONETYPE = "none"
+STRING = "string"
+BOOL_TYPES = ["true", "false"]
+NONE_TYPES = ["none", "nothing"]
 
 
 # shell variables

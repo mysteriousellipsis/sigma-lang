@@ -26,7 +26,9 @@ variable is interchangable with var
 constant is interchangable with constant
 type inference in the future mayhaps
 
-
+```bash
+<name> change to <value>
+```
 
 #data types
 integer: whole numbers
