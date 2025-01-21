@@ -60,7 +60,7 @@ def newvarhandler(tokens):
     varval = tokens[5:]
 
     if varname in set(variables.keys()):
-        raise KeyError(f"this variable already exists. use `{const.REASSIGNMENT_IDENT} <variablename> {const.REASSIGNMENT_OPERATOR} <value>` to change the variable")
+        raise KeyError(f"{varname} already exists. use `{const.REASSIGNMENT_IDENT} <variablename> {const.REASSIGNMENT_OPERATOR} <value>` to change the variable")
     
     variables[varname] = [varconst, vartype, varval]
 

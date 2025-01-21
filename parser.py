@@ -77,13 +77,12 @@ def parsewhile(lines: List, idx: int) -> int:
     # finds the text starting from len(const.WHILE_OPEN)+1 (+1 is to include the space) to len(const.DO)+1
     # this means users can actually do really silly stuff lmao
     # `while                    1 == 1    do` is valid
-    condition = (
-        lines[idx].strip()[len(const.WHILE_OPEN) + 1 : len(const.DO) + 1].strip()
-    )
+    condition = lines[idx].strip()[len(const.WHILE_OPEN) : -len(const.DO)].strip()
 
     block, idx = findblock(lines, idx+1, const.WHILE_CLOSE)
 
     while cond.parse(condition):
+        print(f"block: {block}")
         for line in block:
             # TODO: add ability to parse nested loops and conditionals
             parseline(line)

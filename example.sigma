@@ -1,9 +1,9 @@
 # set a placeholder variable
-new var string sigma is h
+new var bool t is true
+new const string sigma is stop
 
 # prompt
-print input your sigma: 
 
-# input
-receive to variablename
-print variablename
+while t is equal to t do
+    print sigma  
+elihw

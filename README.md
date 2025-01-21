@@ -9,13 +9,15 @@ it tries to be very simple to understand and learn, especially for absolute begi
 ## impremented
 input output  
 variables  
+while loops  
 
 ## in progress
 require "" for string variables
 conditionals  
-while loops  
-for loops  
+break, continue, pass, etc  
+for loops   
+
 
 ## to be added
 multiple statemnets in one line
-github yaml to automatically build an executable with pyinstaller
+github yaml to automatically build an executable with pyinstaller  

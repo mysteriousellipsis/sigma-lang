@@ -10,7 +10,7 @@ def parse(statement: str) -> bool:
     statement = statement.replace(f" {const.LESS}", " < ")
     
     try:
-        eval(statement, {}, vars.variables)
+        return eval(statement, {}, vars.variables)
 
     except Exception as e:
-        raise RuntimeError(f"error evaluating {statement}: {e}.\ndo the variables exist?")
+        raise RuntimeError(f"error evaluating {statement}: {e}")
