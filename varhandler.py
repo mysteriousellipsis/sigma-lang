@@ -13,21 +13,15 @@ def isfloat(var: str) -> str:
     except:
         return False
 
-    if "." in var:
-        return True
-    return False
+    return "." in var
 
 
 def isbool(var: str) -> str:
-    if var in const.BOOL_TYPES:
-        return True
-    return False
+    return var in const.BOOL_TYPES
 
 
 def isnonetype(var: str) -> str:
-    if var in const.NONE_TYPES:
-        return True
-    return False
+    return var in const.NONE_TYPES
 
 
 def checktype(var: str) -> str:
@@ -50,10 +44,10 @@ def evaluate(expr: str) -> bool:
     try:
         return eval(expr, {}, globals.variables)
     except Exception as e:
-        raise RuntimeError(f"error evaluating expression '{expr}': {e}")
+        raise RuntimeError(f"error evaluating expression {expr}: {e}")
 
 
-def newvarhandler(tokens):
+def newvarhandler(tokens: list) -> str:
     if len(tokens) < 6:
         raise SyntaxError("not enough arguments to make a new variable")
 
@@ -69,7 +63,6 @@ def newvarhandler(tokens):
     varconst = tokens[1]
     vartype = tokens[2]
     varname = tokens[3]
-    varval = tokens[5:]
     
     if varname in set(globals.variables.keys()):
         raise KeyError(
@@ -77,16 +70,15 @@ def newvarhandler(tokens):
         )
     
     if len(tokens) > 5 and tokens[4] == const.ASSIGNMENT_OPERATOR:
-        value = evaluate(" ".join(varval))
+        value = evaluate(" ".join(tokens[5:]))
         globals.variables[varname] = [varconst, vartype, value]
         return f"assigned {value} to {varname}"
+    
+    globals.variables[varname] = [varconst, vartype, None]
+    return f"declared {varname} without value"
 
-    else:
-        globals.variables[varname] = [varconst, vartype, None]
-        return f"declared {varname} without value"
 
-
-def reassignhandler(tokens):
+def reassignhandler(tokens: list) -> None:
     if len(tokens) < 3:
         raise SyntaxError("not enough arguments")
 
@@ -98,7 +90,7 @@ def reassignhandler(tokens):
     varname = tokens[1]
     varval = tokens[3]
 
-    if varname not in set(globals.variables.keys()):
+    if varname not in globals.variables:
         raise KeyError(f"variable {varname} does not exist")
 
     if globals.variables[varname][0] in const.CONST_TYPES:

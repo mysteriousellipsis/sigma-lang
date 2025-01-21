@@ -1,7 +1,7 @@
 import const
 import varhandler as vars
 
-def printhandler(tokens) -> None:
+def printhandler(tokens: list) -> None:
     # print line
     if tokens[1] == const.OUTPUT_NEWLINE:
         printline(tokens)
@@ -10,22 +10,20 @@ def printhandler(tokens) -> None:
     else:
         printnoline(tokens)
 
-    return None
-
-def printnoline(tokens) -> None:
-    if tokens[1] in set(vars.variables.keys()):
-        print(f"{''.join(vars.variables[tokens[1]][2])}")
+def printnoline(tokens: list) -> None:
+    if tokens[1] in vars.variables:
+        print(f"{vars.variables[tokens[1]][2]}", end="")
     else:
         print(f"{' '.join(tokens[1:])}", end="")
 
-def printline(tokens) -> None:
-    if tokens[2] in set(vars.variables.keys()):
-        print(f"{' '.join(vars.variables[tokens[2]][2])}")
+def printline(tokens: list) -> None:
+    if tokens[2] in vars.variables:
+        print(vars.variables[tokens[2]][2])
     else:
         print(f"{' '.join(tokens[2:])}")
 
 
-def recvlineshandler(tokens) -> str:
+def recvlineshandler(tokens: list) -> str:
     # input to variable
     if (
         len(tokens) == 3
@@ -33,6 +31,6 @@ def recvlineshandler(tokens) -> str:
     ):
         usrinput = input()
         vars.variables[tokens[2]] = [const.VAR_TYPES[0], const.STRING, usrinput]
-    else: usrinput = ""
-    return usrinput
+        return usrinput
+    return ""
 

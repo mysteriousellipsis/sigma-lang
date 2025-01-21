@@ -15,7 +15,7 @@ def tokenize(line: str) -> List:
     return re.findall(r"\".*?\"|\S+", line)
 
 
-def findblock(lines: list, startidx: int, endiden: str) -> List | int:
+def findblock(lines: list, startidx: int, endiden: str):
     """
     finds block between the start index and the
     """
@@ -52,51 +52,6 @@ def parseif(tokens, executionstack):
     if tokens[0] == const.IF_CLOSE:
         executionstack.pop()
         return "end_if"
-    
-    return None
-
-# def parseif(lines, startidx) -> int:
-#     """
-#     parses if statements and returns the index to continue at
-#     """
-#     conditions = []
-#     blocks = []
-
-#     idx = startidx
-
-#     while idx < len(lines):
-#         line = lines[idx].strip()
-
-#         # if the line is an if or elif line
-#         if line.startswith(const.IF_OPEN) or line.startswith(const.ELIF):
-#             # finds the condition
-#             condition = line.split(f"{const.THEN} {const.DO}")[0][3:].strip()
-#             block, idx = findblock(lines, idx + 1, const.IF_CLOSE)
-#             conditions.append(condition)
-#             blocks.append(block)
-
-#         # if the line is an else block
-#         elif line == f"{const.ELSE} {const.DO}":
-#             block, idx = findblock(lines, idx + 1, const.IF_CLOSE)
-#             conditions.append(None)
-#             blocks.append(block)
-
-#         # if the line is the ending of the if else
-#         elif line == const.IF_CLOSE:
-#             break
-
-#         # raises error if there is no if, elif, else, fi
-#         else:
-#             raise RuntimeError(f"Unexpected line in if block: {line}")
-
-#     for condition, block in zip(conditions, blocks):
-#         if condition is None or cond.parse(condition):
-#             for line in block:
-#                 # TODO:
-#                 parseline(line)
-#             break
-
-#     return idx
 
 
 def parsewhile(lines: List, idx: int) -> int:
@@ -111,11 +66,9 @@ def parsewhile(lines: List, idx: int) -> int:
 
     block, idx = findblock(lines, idx + 1, const.WHILE_CLOSE)
 
-    while cond.parse(condition):
-        print(f"block: {block}")
+    while cond.parse(tokenize(condition)):
         for line in block:
-            # TODO: add ability to parse nested loops and conditionals
-            parseline(line)
+            parseline(line, idx, [])
 
     return idx
 
@@ -132,10 +85,10 @@ def parsefor(lines: List, idx: int) -> int:
 
     for val in iterable:
         # stores the variable with "_forloopitered" to prevent overlapping names
-        globals.variables[f"{varname}_forloopitered"] == val
+        globals.variables[f"{varname}_forloopitered"] = [const.VAR_TYPES[0], const.STRING, val]
 
         for line in block:
-            parseline(line)
+            parseline(line, idx, [])
 
     return idx
 
@@ -145,7 +98,7 @@ def parseline(line: str, idx, executionstack) -> Any:
     line = re.sub(f"{const.COMMENT_OPEN}.*?{const.COMMENT_CLOSE}", "", line)
     
     if not line:
-        return None
+        return None, idx+1
 
     tokens = tokenize(line)
     
@@ -154,8 +107,7 @@ def parseline(line: str, idx, executionstack) -> Any:
         return None, idx+1
     
     if tokens[0] == const.REASSIGNMENT_IDENT:
-        var.reassignhandler(tokens)
-        return 0
+        return var.reassignhandler(tokens), idx+1
 
     if tokens[0] == const.NEW_VAR_IDENT and tokens[1] in const.VAR_TYPES+const.CONST_TYPES:
         return var.newvarhandler(tokens), idx+1
@@ -180,13 +132,5 @@ def parseline(line: str, idx, executionstack) -> Any:
 
     if tokens[0] in [const.IF_OPEN, const.ELSE, const.ELIF, const.IF_CLOSE]:
         return parseif(tokens, executionstack), idx+1
-
-    if tokens[0] == const.WHILE_OPEN:
-        # TODO:
-        return const.WHILE_OPEN
-
-    if tokens[0] == const.FOR_OPEN:
-        # TODO
-        return const.FOR_OPEN
-
+    
     return line, idx+1

@@ -1,0 +1,59 @@
+<-- Test for variable declarations -->
+new var string "name" is "John"
+new const int "age" is 30
+new var float "height"
+new var none "optional"
+
+<-- Test for reassignment -->
+change "name" to "Doe"
+change "height" to 5.9
+
+<-- Output values -->
+print line "Name: "
+print "name"
+print line "Age: "
+print "age"
+print line "Height: "
+print "height"
+print line "Optional: "
+print "optional"
+
+<-- Conditional statements -->
+if "age is greater than 18" then
+    print line "You are an adult"
+elif "age is less than or equal to 18" then
+    print line "You are a minor"
+else
+    print line "Invalid age"
+fi
+
+<-- Loop statements -->
+new var int "counter" is 0
+while "counter is less than 3" do
+    print "counter"
+    print line " is being incremented."
+    change "counter" to "counter + 1"
+elihw
+
+<-- For loop -->
+new var int "sum" is 0
+for "num" in [1, 2, 3, 4, 5] rof
+    print line "Current number is: "
+    print "num"
+    change "sum" to "sum + num"
+rof
+print line "Total sum is: "
+print "sum"
+
+<-- Test input -->
+receive to "user_input"
+print line "You entered: "
+print "user_input"
+
+<-- Goto and labels -->
+label "start"
+print line "This is the start label"
+goto "end"
+print line "This should not print"
+label "end"
+print line "This is the end
