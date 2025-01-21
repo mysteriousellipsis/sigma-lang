@@ -1,2 +1,9 @@
-new var string variablename is testing 1 2 3
-print line variablename
+# set a placeholder variable
+new var string sigma is h
+
+# prompt
+print input your sigma: 
+
+# input
+receive to variablename
+print variablename

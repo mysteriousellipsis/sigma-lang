@@ -11,7 +11,7 @@ IF_OPEN = "if"
 THEN = "then"
 ELSE = "else"
 IF_CLOSE = "fi"
-START_EXECUTING = "do"
+DO = "do"
 
 # assignment
 NEW_VAR_IDENT = "new"
