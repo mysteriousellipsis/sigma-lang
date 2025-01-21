@@ -1,6 +1,6 @@
 import const
 
-def printlinehandler(tokens):
+def printlinehandler(tokens) -> None:
     # print line
     if tokens[1] == const.OUTPUT_NEWLINE:
         print(f"{''.join(tokens[2:])}")
@@ -8,6 +8,8 @@ def printlinehandler(tokens):
     # print
     else:
         print(f"{''.join(tokens[1:])}")
+
+    return None
         
 
 def recvlineshandler(tokens) -> str:
@@ -20,6 +22,6 @@ def recvlineshandler(tokens) -> str:
         
         usrinput = input()
         vars.variables[tokens[3]] = usrinput
-
+    else: usrinput = ""
     return usrinput
 
