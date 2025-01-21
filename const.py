@@ -21,6 +21,11 @@ ASSIGNMENT_OPERATOR = "is"
 REASSIGNMENT_IDENT = "change"
 REASSIGNMENT_OPERATOR = "to"
 
+# math
+ADD = "add"
+SUBTRACT = "minus"
+DIVIDE = "divided by"
+MULTIPLY = "multiplied by"
 
 # logic 
 EQUALS = "is equal to"

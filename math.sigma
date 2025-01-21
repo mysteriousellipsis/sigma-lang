@@ -1,0 +1,13 @@
+new var int "counter" is 10
+new var int "counter2" is 0
+print "Initial counter: " counter
+print line "counter add 1"
+change "counter2" to "counter add 1"
+change "counter" to "counter add 1"
+print "After addition: " counter
+change "counter" to "counter minus 2"
+print "After subtraction: " counter
+change "counter" to "counter multiplied by 3"
+print "After multiplication: " counter
+change "counter" to "counter divided by 2"
+print "After division: " counter

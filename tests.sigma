@@ -35,7 +35,7 @@ new var int "counter" is 0
 while "counter is less than 3" do
     print "counter"
     print line " is being incremented."
-    change "counter" to "counter + 1"
+    change "counter" to "counter add 1"
 elihw
 
 <-- For loop -->
@@ -43,7 +43,7 @@ new var int "sum" is 0
 for "num" in [1, 2, 3, 4, 5] rof
     print line "Current number is: "
     print "num"
-    change "sum" to "sum + num"
+    change "sum" to "sum add num"
 rof
 print line "Total sum is: "
 print "sum"
@@ -59,4 +59,4 @@ print line "This is the start label"
 goto "end"
 print line "This should not print"
 label "end"
-print line "This is the end
+print line "This is the end"

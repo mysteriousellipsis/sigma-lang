@@ -1,5 +1,5 @@
 import const
-import varhandler as vars
+import globals
 
 def printhandler(tokens: list) -> None:
     # print line
@@ -11,14 +11,14 @@ def printhandler(tokens: list) -> None:
         printnoline(tokens)
 
 def printnoline(tokens: list) -> None:
-    if tokens[1] in vars.variables:
-        print(f"{vars.variables[tokens[1]][2]}", end="")
+    if tokens[1] in globals.variables:
+        print(f"{globals.variables[tokens[1]][2]}", end="")
     else:
         print(f"{' '.join(tokens[1:])}", end="")
 
 def printline(tokens: list) -> None:
-    if tokens[2] in vars.variables:
-        print(vars.variables[tokens[2]][2])
+    if tokens[2] in globals.variables:
+        print(globals.variables[tokens[2]][2])
     else:
         print(f"{' '.join(tokens[2:])}")
 
@@ -30,7 +30,7 @@ def recvlineshandler(tokens: list) -> str:
         and tokens[1] == const.INPUT_TO
     ):
         usrinput = input()
-        vars.variables[tokens[2]] = [const.VAR_TYPES[0], const.STRING, usrinput]
+        globals.variables[tokens[2]] = [const.VAR_TYPES[0], const.STRING, usrinput]
         return usrinput
     return ""
 
