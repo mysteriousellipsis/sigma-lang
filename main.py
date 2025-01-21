@@ -2,7 +2,7 @@ import const
 import sys
 import shell
 import parser
-import varhandlers as vars
+import varhandler as vars
 
 args = sys.argv[1:]
 
@@ -22,7 +22,9 @@ def mainloop(filename: str) -> int | str:
     
     # parse the files
     for line in lines:
-        parser.parseline(line)
+        if parser.parseline(line):
+            # TODO: handle if else and loops
+            pass
 
 if len(args) == 0:
     # shell mode soon?

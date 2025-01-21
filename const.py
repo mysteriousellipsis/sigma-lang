@@ -39,7 +39,7 @@ OUTPUT_NEWLINE = "line"
 # loops
 WHILE_OPEN = "while"
 WHILE_CLOSE = "elhiw"
-FOR = "for"
+FOR_OPEN = "for"
 FOR_CLOSE = "rof"
 IN = "in"
 
