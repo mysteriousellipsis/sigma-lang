@@ -15,4 +15,4 @@ while loops
 for loops  
 
 ## to be added
-?
+multiple statemnets in one line
