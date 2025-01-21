@@ -48,7 +48,7 @@ def newvarhandler(tokens):
     if tokens[1] not in (const.CONST_TYPES + const.VAR_TYPES):
         raise SyntaxError("variable needs to be a constant or variable")
     
-    if tokens[2] not in (const.INTEGER + const.BOOL + const.FLOAT + const.NONETYPE):
+    if tokens[2] not in const.ALL_TYPES:
         raise SyntaxError("variable needs a type")
     
     if tokens[4] != const.ASSIGNMENT_OPERATOR:

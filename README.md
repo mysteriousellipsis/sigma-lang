@@ -6,7 +6,7 @@ it aims to be very simple to understand and learn, especially for absolute begin
 
 # progress on stuff
 ## impremented
-input output  
+input output (a bit broken)  
 variables  
 
 ## in progress

@@ -15,10 +15,10 @@ def mainloop(filename: str) -> int | str:
         if not lines:
             return 0
 
-        if lines[0] != const.FILE_IDENT:
-            raise RuntimeError("file does not have identifier !>sigma")
-        else:
-            raise RuntimeError("wrong file extension... rename your files to <filename>.sl then try again!")
+    elif lines[0] != const.FILE_IDENT and filename[-6:0] != ".sigma":
+        raise RuntimeError("file does not have identifier !>sigma")
+    else:
+        raise RuntimeError("wrong file extension... rename your files to <filename>.sl then try again!")
     
     # parse the files
     for line in lines:

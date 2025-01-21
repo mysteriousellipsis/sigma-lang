@@ -31,7 +31,7 @@ def parseline(line: str) -> Any:
         return 0
     
     if tokens[0] == const.OUTPUT:
-        io.printlinehandler(tokens)
+        io.printhandler(tokens)
         return 0
     
     

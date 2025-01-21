@@ -49,6 +49,7 @@ FLOAT = "float"
 BOOL = "bool"
 NONETYPE = "none"
 STRING = "string"
+ALL_TYPES = {INTEGER, FLOAT, BOOL, NONETYPE, STRING}
 BOOL_TYPES = ["true", "false"]
 NONE_TYPES = ["none", "nothing"]
 
