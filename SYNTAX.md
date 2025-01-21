@@ -1,5 +1,5 @@
 # file structure
-file extension .sl or file has `!>simplelang` as the first line
+file extension .sigma or file has `!>sigma` as the first line
 
 # conditionals
 
