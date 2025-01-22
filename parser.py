@@ -141,7 +141,8 @@ def parseline(lines, line: str, idx, executionstack) -> Any:
         return io.printhandler(tokens), idx + 1
 
     if tokens[0] in [const.IF_OPEN, const.ELSE, const.ELIF, const.IF_CLOSE]:
-        return parseif(tokens, executionstack), idx + 1
+        parseif(tokens, executionstack)
+        return None, idx + 1
     
     if tokens[0] == const.FILE_IDENT:
         return None, idx + 1
