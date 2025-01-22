@@ -1,6 +1,7 @@
 import const
 import globals
 import re
+import logichandler as logic
 from exceptions import *
 
 
@@ -51,17 +52,15 @@ def evaluate(expr: str) -> any:
     expr = expr.replace(const.SUBTRACT, "-")
     expr = expr.replace(const.MULTIPLY, "*")
     expr = expr.replace(const.DIVIDE, "/")
-    
+    expr.strip("'").strip('"').strip()
+
     tokens = re.findall(r"\".*?\"|\S+", expr)
+
     for i, token in enumerate(tokens):
-        # TODO: this doesnt work
-        print("i")
-        print(i)
-        print("token")
-        print(token)
-        if token.strip() in globals.variables:  # Replace variable names with their values
+        if token.strip() in globals.variables:  # replace variable names with their values
             tokens[i] = str(globals.variables[token][2])
-    expr = " ".join(tokens)
+    
+    expr = "".join(tokens)
     
     try:
         return eval(expr, {}, {})
@@ -115,18 +114,15 @@ def reassignhandler(tokens: list) -> None:
         )
 
     varname = tokens[1]
-    varval = " ".join(tokens[3:])
+    varval = logic.parse(str(evaluate(" ".join(tokens[3:]))).split())
     
     if varname not in globals.variables:
         raise KeyError(f"variable {varname} does not exist")
 
     if globals.variables[varname][0] in const.CONST_TYPES:
-        raise ReassignmentError("unable to reassign constants")
+        raise ReassignmentError("unable to reassign constant {varname}")
     
-    varval_evaled = evaluate(varval)
-    expectedtype = globals.variables[varname][1]
-    
-    if checktype(varval) != expectedtype:
+    if checktype(varval) != globals.variables[varname][1]:
         raise ReassignmentError(
             f"variable types are not the same. cannot reassign variable {varname} with type {globals.variables[varname][1]} to value {varval} with type {checktype(varval)}"
         )

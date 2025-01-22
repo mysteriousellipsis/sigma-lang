@@ -26,6 +26,7 @@ ADD = "add"
 SUBTRACT = "minus"
 DIVIDE = "divided by"
 MULTIPLY = "multiplied by"
+MATH_OPERATORS = {ADD, SUBTRACT, DIVIDE, MULTIPLY}
 
 # logic 
 EQUALS = "is equal to"
@@ -36,7 +37,7 @@ LESS = "is less than"
 NOT = "is not"
 LOGICAL_AND = "and"
 LOGICAL_OR = "or"
-LOGICAL_NOT = "not"
+LOGICAL_OPERATORS = {LOGICAL_AND, LOGICAL_OR, NOT}
 
 # flow control
 BREAK = "break"

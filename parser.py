@@ -2,7 +2,7 @@ from typing import List, Any
 import varhandler as var
 import globals
 import iohandler as io
-import logichandler as cond
+import logichandler as logic
 import flowcontrol as goto
 import const
 import re
@@ -36,13 +36,13 @@ def parseif(tokens, executionstack):
     '''
     if tokens[0] == const.IF_OPEN:
         condition = " ".join(tokens[1:tokens.index(const.THEN)])
-        executionstack.append(cond.parse(condition))
+        executionstack.append(logic.parse(condition))
         return "start_if"
     
     if tokens[0] == const.ELIF:
         condition = " ".join(tokens[1:tokens.index(const.THEN)])
         if not executionstack[-1]:
-            executionstack[-1] = cond.parse(condition)
+            executionstack[-1] = logic.parse(condition)
         return "start_elif"
     
     if tokens[0] == const.ELSE:
@@ -65,8 +65,9 @@ def parsewhile(lines: List, idx: int) -> int:
     condition = lines[idx].strip()[len(const.WHILE_OPEN) : -len(const.DO)].strip()
 
     block, idx = findblock(lines, idx + 1, const.WHILE_CLOSE)
-
-    while cond.parse(tokenize(condition)):
+    
+    
+    while logic.parse(tokenize(condition)):
         for line in block:
             parseline(line, idx, [])
 
