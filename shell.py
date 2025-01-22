@@ -1,6 +1,6 @@
 def shell() -> None:
     while True:
         pass
-    
-# shell mode soon?
 
+
+# shell mode soon?

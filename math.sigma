@@ -1,5 +1,5 @@
 new var int counter is 10
-nev var float counter2 is 10
+new var float counter2 is 10
 print "Initial counter: " 
 print line counter
 print 

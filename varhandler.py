@@ -1,8 +1,9 @@
 import const
 import globals
 import re
-import logichandler as logic
+import utils as logic
 from exceptions import *
+from utils import *
 
 
 def isint(var: str) -> str:
@@ -44,34 +45,10 @@ def checktype(var: str) -> str:
     return const.STRING
 
 
-def evaluate(expr: str) -> any:
-    '''
-    evaluates the expression using local functions
-    '''
-    expr = expr.replace(const.ADD, "+")
-    expr = expr.replace(const.SUBTRACT, "-")
-    expr = expr.replace(const.MULTIPLY, "*")
-    expr = expr.replace(const.DIVIDE, "/")
-    expr.strip("'").strip('"').strip()
-
-    tokens = re.findall(r"\".*?\"|\S+", expr)
-
-    for i, token in enumerate(tokens):
-        if token.strip() in globals.variables:  # replace variable names with their values
-            tokens[i] = str(globals.variables[token][2])
-    
-    expr = "".join(tokens)
-    
-    try:
-        return eval(expr, {}, {})
-    except Exception as e:
-        raise RuntimeError(f"error evaluating expression {expr}: {e}")
-
-
 def newvarhandler(tokens: list) -> str:
-    '''
+    """
     handles registering a variable
-    '''
+    """
     if len(tokens) < 4:
         raise SyntaxError("not enough arguments to make a new variable")
 
@@ -84,27 +61,27 @@ def newvarhandler(tokens: list) -> str:
     varconst = tokens[1]
     vartype = tokens[2]
     varname = tokens[3]
-    
+
     if varname in set(globals.variables.keys()):
         raise KeyError(
             f"{varname} already exists. use `{const.REASSIGNMENT_IDENT} <variablename> {const.REASSIGNMENT_OPERATOR} <value>` to change the variable"
         )
-    
+
     if len(tokens) > 5:
         if tokens[4] == const.ASSIGNMENT_OPERATOR:
             value = evaluate(" ".join(tokens[5:]))
             globals.variables[varname] = [varconst, vartype, value]
             return f"assigned {value} to {varname}"
         raise SyntaxError(f"not enough arguments to make a new variable :()")
-    
+
     globals.variables[varname] = [varconst, vartype, None]
     return f"declared {varname} without value"
 
 
 def reassignhandler(tokens: list) -> None:
-    '''
+    """
     handles reassigning a variable
-    '''
+    """
     if len(tokens) < 3:
         raise SyntaxError("not enough arguments")
 
@@ -115,13 +92,13 @@ def reassignhandler(tokens: list) -> None:
 
     varname = tokens[1]
     varval = logic.parse(str(evaluate(" ".join(tokens[3:]))).split())
-    
+
     if varname not in globals.variables:
         raise KeyError(f"variable {varname} does not exist")
 
     if globals.variables[varname][0] in const.CONST_TYPES:
         raise ReassignmentError("unable to reassign constant {varname}")
-    
+
     if checktype(varval) != globals.variables[varname][1]:
         raise ReassignmentError(
             f"variable types are not the same. cannot reassign variable {varname} with type {globals.variables[varname][1]} to value {varval} with type {checktype(varval)}"

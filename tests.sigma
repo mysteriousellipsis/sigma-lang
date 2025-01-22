@@ -5,7 +5,7 @@
 new var string "name" is "John"
 new const int "age" is 30
 new var float "height"
-new var none "optional"
+new var none
 
 <-- Test for reassignment -->
 change "name" to "Doe"

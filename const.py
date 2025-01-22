@@ -1,5 +1,6 @@
 # important ntihngs
 FILE_IDENT = "!>sigma"
+FILE_EXT = ".sigma"
 
 # comments
 COMMENT_OPEN = "<--"
@@ -28,7 +29,7 @@ DIVIDE = "divided by"
 MULTIPLY = "multiplied by"
 MATH_OPERATORS = {ADD, SUBTRACT, DIVIDE, MULTIPLY}
 
-# logic 
+# logic
 EQUALS = "is equal to"
 GTE = "is greater than or equal to"
 LTE = "is less than or equal to"

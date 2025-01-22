@@ -21,3 +21,4 @@ for loops
 ## to be added
 multiple statemnets in one line
 github yaml to automatically build an executable with pyinstaller  
+delete var and const?  
