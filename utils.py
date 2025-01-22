@@ -1,34 +1,27 @@
 import const
 import globals
+import re
 
 
 def parse(tokens: list | str) -> bool:
-    try:
-        expr = "".join(tokens)
-    except:
-        expr = tokens
+    '''
+    parses conditionals and logic statements
+    '''
+    expr = "".join(tokens) if isinstance(tokens, list) else tokens
 
     expr = (
         expr.replace(const.EQUALS, "==")
         .replace(const.GTE, ">=")
         .replace(const.LTE, "<=")
-    )
-    expr = (
-        expr.replace(const.GREATER, ">")
+        .replace(const.GREATER, ">")
         .replace(const.LESS, "<")
         .replace(const.NOT, "!=")
-    )
-    expr = (
-        expr.replace(const.LOGICAL_AND, " and ")
+        .replace(const.LOGICAL_AND, " and ")
         .replace(const.LOGICAL_OR, " or ")
-        .replace(const.NOT, " not ")
     )
-    expr = (
-        expr.replace(const.ADD, "+")
-        .replace(const.SUBTRACT, "minus")
-        .replace(const.MULTIPLY, "*")
-        .replace(const.DIVIDE, "/")
-    )
+
+    # replaces ${variable} with the variable's value
+    re.sub(r"\${(\w+)}", lambda m: str(globals.variables.get(m.group(1), ['', '', ''])[2]), expr)
 
     try:
         return eval(expr, {}, globals.variables)
@@ -47,18 +40,17 @@ def evaluate(expr: str) -> any:
         .replace(const.DIVIDE, " / ")
     )
 
-    expr.strip("'").strip('"')
+    tokens = re.findall(r'".*?"|\S+', expr)
 
-    # tokens = re.findall(r"\".*?\"|\S+", expr)
-    tokens = expr.split()
-
-    for i, token in enumerate(tokens):
-        if (
-            token.strip() in globals.variables
-        ):  # replace variable names with their values
-            tokens[i] = f"{ str(globals.variables[token][2])} "
-
-    expr = " ".join(tokens)
+    for token in tokens:
+        if token.startswith('"') and not token.endswith('"'):
+            raise SyntaxError(f"mismatched quotes in (token)")
+        
+        if not token.startswith('"') and not re.match(r"\w+", token):
+            raise SyntaxError(f"no quotes found in {token}")
+    
+    # replaces ${variable} with variable value in strings
+    expr = re.sub(r"\${(\w+)}", lambda m: str(globals.variables.get(m.group(1), ['', '', ''])[2]), expr)
 
     try:
         return eval(expr, {}, {})

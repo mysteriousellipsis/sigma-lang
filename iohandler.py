@@ -1,5 +1,6 @@
 import const
 import globals
+import re
 
 
 def printhandler(tokens: list) -> None:
@@ -15,22 +16,22 @@ def printhandler(tokens: list) -> None:
         printnoline(tokens)
 
 
-# TODO:
 def removequotes(text: str):
-    if text.startswith("'") or text.startswith('"'):
-        return text[1:]
-    elif text.endswith('"') and text.endswith("'"):
-        return text[:-1]
-    return text
+    '''
+    removes quotes from 
+    '''
+    return text.strip('"')
 
 
 def printnoline(tokens: list) -> None:
     # TODO:
     tokens = [removequotes(token) for token in tokens]
     if tokens[1] in globals.variables:
-        print(f"{globals.variables[tokens[1]][2]}{tokens[2:]}", end="")
+        print(f"{globals.variables[tokens[1]][2]}{' '.join(tokens[2:])}", end="")
     else:
-        print(f"{' '.join(tokens[1:])}", end="")
+        print(' '.join([re.sub(r"\${(\w+)}", 
+                               lambda m: str(globals.variables.get(m.group(1), ['', '', ''])[2]), 
+                               token) for token in tokens[1:]]), end="")
 
 
 def printline(tokens: list) -> None:
@@ -38,7 +39,9 @@ def printline(tokens: list) -> None:
     if tokens[1] in globals.variables:
         print(f"{globals.variables[tokens[2]][2]}{tokens[3:]}")
     else:
-        print(f"{' '.join(tokens[2:])}")
+        print(f"{' '.join([re.sub(r"\${(\w+)}", 
+                                  lambda m: str(globals.variables.get(m.group(1), ['', '', ''])[2]), 
+                                  token) for token in tokens[2:]])}")
 
 
 def recvlineshandler(tokens: list) -> str:

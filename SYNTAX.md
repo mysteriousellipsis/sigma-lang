@@ -4,18 +4,41 @@ file extension .sigma or file has `!>sigma` as the first line
 # conditionals
 
 ```bash
-if <statement> then do
-    expression;
-    expression;
-elif <statement> then do
-    expression;
+if (<statement>) then do
+    expression
+    expression
+elif (<statement>) then do
+    expression
 else do
-    expression;
+    expression
 fi
 ```
 
+## example
+sigmalang: 
+```bash
+if (x is greater than 10) then do
+    print "x is large"
+elif (x is equal to 10) then do
+    print "x is 10"
+else do
+    print "x is small"
+fi
+```
+python equivalent:
+```python
+if x > 10:
+    print("x is large")
+elif x == 10:
+    print("x is equal to 10")
+else:
+    print("x is small")
+```
+
 # variable assignment
-variables can be stored in variables.json or as a dictionary
+variables are stored as a dictionary (globals.py > variables)
+
+## assigning
 ```bash
 new variable <type> <name> is <expression>
 new constant <type> <name> is <expression>
@@ -24,43 +47,79 @@ new variable <type> <name>
 
 variable is interchangable with var
 constant is interchangable with constant
-type inference in the future mayhaps
 
+
+## reassigning 
 ```bash
 <name> change to <value>
 ```
 
-#data types
-integer: whole numbers
-float: decimals
-double: decimals but more accurate
-boolean: true/false
-nonetype: none/nothing
+## examples
+sigmalang:
+```bash
+new variable int count is 5
+new constant string message is "hello, world!"
+change count to 10
+```
+python equivalent:
+```python
+count: int = 5
+message: str = "hello, world!"
+count = 10
+```
 
+# data types
+integer: whole numbers (`1`, `42`)
+float: decimals (`3.14`, `2.71`)
+boolean: `true` or `false`
+nonetype: `none` or `nothing`
+string: any text enclosed in double quotes (`"hello, world!"`)
+
+note: strings can include variables by using ${variablename}
+eg:
+`print "the count is ${count}"`
 
 # comment
+comments are surrounded by `<--` and `-->`
 ```bash
-# comments
+<-- comments -->
 ```
 
 # loop
-for
+## while
 
 ```bash
-for <variable> in <interable> do
-    expression;
-rof
-```
-
-while
-
-```bash
-while condition do
-    expression;
+while (<condition>) do
+    expression
 elihw
 ```
 
+## for 
+(not used currently as iterables do not exist)
+
+```bash
+for (<variable> in <iterable>) do
+    expression
+rof
+```
+
+## examples
+sigmalang:
+```bash
+while (count is greater than 0) do
+    print "count: ${count}"
+    count change to count minus 1
+elihw
+```
+python equivalent:
+```python
+while count > 0:
+    print(f"count {count}")
+    count -= 1
+```
+
 # logic
+all logic should be between brackets
 
 greater than or equal to (>=)
 ```bash
@@ -93,16 +152,44 @@ not equals to (!=)
 <statement> is not <statement>
 ```
 
-# receiving input
-input
+## logical operators
+and: `and`
+or: `or`
+not: `not`
+
+## example
+sigmalang:
 ```bash
-receive
-receive 2 lines
+if ((x is greater than 5) and (y is less than 10)) then do
+    print "x and y are in range"
+```
+python equivalent:
+```python
+if x > 5 and y < 10:
+    print("x and y are in range")
 ```
 
 # printing
-print
+sigmalang:
 ```bash
-print 
-print line
+print "print without newline"
+print line "print with newline"
 ```
+python equivalent
+```python
+print("print without newline", end="")
+print("print with newline")
+```
+
+# receiving input
+input
+```bash
+receive to variable
+```
+## example
+```bash
+print "input username: "
+receive to username
+print "welcome, ${username}"
+```
+

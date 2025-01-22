@@ -10,9 +10,9 @@ import re
 
 def tokenize(line: str) -> List:
     """
-    tokenize
+    tokenizes line
     """
-    return re.findall(r"\".*?\"|\S+", line)
+    return re.findall(r'".*?"|\S+', line)
 
 
 def findblock(lines: list, startidx: int, endiden: str):
@@ -139,5 +139,8 @@ def parseline(line: str, idx, executionstack) -> Any:
 
     if tokens[0] in [const.IF_OPEN, const.ELSE, const.ELIF, const.IF_CLOSE]:
         return parseif(tokens, executionstack), idx + 1
-
-    raise KeyError("unrecognized ")
+    
+    if tokens[0] == const.FILE_IDENT:
+        return None, idx + 1
+    
+    raise KeyError(f"unrecognized argument {tokens[0]}")

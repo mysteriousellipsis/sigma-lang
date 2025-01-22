@@ -1,4 +1,5 @@
 # sigma lang by dimini171
+potential rewrite coming soon to fix my spagetthi code
 
 # what is this??
 sigma lang was made for our final year computing coursework.   
@@ -13,12 +14,13 @@ while loops
 break, continue, pass, etc  
 goto  
 conditionals  
+making `print "text" <variable>` print properly
 
 
 ## in progress 
-making `print "text" variable` print properly
+
 
 ## to be added
-multiple statemnets in one line
-github yaml to automatically build an executable with pyinstaller  
-delete var and const?  
+multiple statemnets in one line  
+github yaml to automatically build an executable with pyinstaller   
+~delete var and const?~   
