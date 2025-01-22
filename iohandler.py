@@ -8,7 +8,6 @@ def printhandler(tokens: list) -> None:
 
     # print line
     elif tokens[1] == const.OUTPUT_NEWLINE:
-        print(tokens)
         printline(tokens)
 
     # print

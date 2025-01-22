@@ -10,13 +10,13 @@ it tries to be very simple to understand and learn, especially for absolute begi
 input output  
 variables  
 while loops  
-
-## in progress
-require "" for string variables
-conditionals  
 break, continue, pass, etc  
-for loops   
+goto  
+conditionals  
 
+
+## in progress 
+making `print "text" variable` print properly
 
 ## to be added
 multiple statemnets in one line
