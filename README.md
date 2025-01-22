@@ -18,7 +18,7 @@ making `print "text" <variable>` print properly
 
 
 ## in progress 
-
+printing special characters  
 
 ## to be added
 multiple statemnets in one line  
