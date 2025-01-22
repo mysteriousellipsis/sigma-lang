@@ -7,7 +7,7 @@ COMMENT_OPEN = "<--"
 COMMENT_CLOSE = "-->"
 
 # conditionals
-ELIF = "else if"
+ELIF = "elif"
 IF_OPEN = "if"
 THEN = "then"
 ELSE = "else"

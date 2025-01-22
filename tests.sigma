@@ -16,7 +16,7 @@ print line "Counter starts at ${counter}"
 change counter to 10
 print line "Counter changed to ${counter}"
 
-change greeting to "Hi, Sigma!"
+change greeting to "Hi, Sigma"
 print line "Greeting updated to: ${greeting}"
 
 <--  Test input -->
