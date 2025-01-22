@@ -24,7 +24,7 @@ def mainloop(filename: str) -> int | str:
 
     while idx < len(lines):
         line = lines[idx]
-        result, idx = parser.parseline(line, idx, executionstack)
+        result, idx = parser.parseline(lines, line, idx, executionstack)
 
         if result is not None and (not executionstack or executionstack[-1]):
             if result == "break":

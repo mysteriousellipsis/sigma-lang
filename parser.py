@@ -15,19 +15,18 @@ def tokenize(line: str) -> List:
     return re.findall(r'".*?"|\S+', line)
 
 
-def findblock(lines: list, startidx: int, endiden: str):
+def findblock(lines: list, idx: int, endiden: str):
     """
     finds block between the start index and the
     """
     block = []
 
-    for idx, line in enumerate(lines[startidx:], start=startidx):
-        if line.strip() == endiden:
-            return block, idx
+    for i in range(idx, len(lines)):
+        line = lines[i].strip()
+        if line == endiden:
+            return block, i
         block.append(line)
-
-    # raises error if there is no eding
-    raise RuntimeError(f"expected {endiden} but could not find it :(")
+    raise SyntaxError(f"expected {endiden} but could not find it")
 
 
 def parseif(tokens, executionstack):
@@ -36,13 +35,13 @@ def parseif(tokens, executionstack):
     """
     if tokens[0] == const.IF_OPEN:
         condition = " ".join(tokens[1 : tokens.index(const.THEN)])
-        executionstack.append(logic.parse(condition))
+        executionstack.append(logic.evaluate(condition))
         return "start_if"
 
     if tokens[0] == const.ELIF:
         condition = " ".join(tokens[1 : tokens.index(const.THEN)])
         if not executionstack[-1]:
-            executionstack[-1] = logic.parse(condition)
+            executionstack[-1] = logic.evaluate(condition)
         return "start_elif"
 
     if tokens[0] == const.ELSE:
@@ -62,15 +61,19 @@ def parsewhile(lines: List, idx: int) -> int:
     # finds the text starting from len(const.WHILE_OPEN)+1 (+1 is to include the space) to len(const.DO)+1
     # this means users can actually do really silly stuff lmao
     # `while                    1 == 1    do` is valid
-    condition = lines[idx].strip()[len(const.WHILE_OPEN) : -len(const.DO)].strip()
+    condition = lines[idx][len(const.WHILE_OPEN): -len(const.DO)].strip()
 
     block, idx = findblock(lines, idx + 1, const.WHILE_CLOSE)
 
-    while logic.parse(tokenize(condition)):
+    while logic.evaluate(condition):
         for line in block:
-            parseline(line, idx, [])
+            result, _ = parseline(lines, line, idx, [])
+            if result == "break":
+                return idx
+            elif result == "continue":
+                break
 
-    return idx
+    return idx + 1
 
 
 def parsefor(lines: List, idx: int) -> int:
@@ -92,12 +95,12 @@ def parsefor(lines: List, idx: int) -> int:
         ]
 
         for line in block:
-            parseline(line, idx, [])
+            parseline(lines, line, idx, [])
 
     return idx
 
 
-def parseline(line: str, idx, executionstack) -> Any:
+def parseline(lines, line: str, idx, executionstack) -> Any:
     # remove comments from line
     line = re.sub(f"{const.COMMENT_OPEN}.*?{const.COMMENT_CLOSE}", "", line)
 
@@ -143,4 +146,10 @@ def parseline(line: str, idx, executionstack) -> Any:
     if tokens[0] == const.FILE_IDENT:
         return None, idx + 1
     
+    if tokens[0] == const.WHILE_OPEN:
+        return None, parsewhile(lines, idx)
+    
+    if tokens[0] == const.WHILE_CLOSE:
+        return None, idx + 1
+
     raise KeyError(f"unrecognized argument {tokens[0]}")

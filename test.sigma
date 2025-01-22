@@ -1,0 +1,6 @@
+new var int counter is 0
+
+while (counter is less than 5) do
+    print line "counter"
+    change counter to (counter add 1)
+elihw

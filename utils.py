@@ -3,11 +3,11 @@ import globals
 import re
 
 
-def parse(tokens: list | str) -> bool:
+def evaluate(expr: str | list) -> any:
     '''
-    parses conditionals and logic statements
+    evaluates the expression and parses conditionals and logic statements
     '''
-    expr = "".join(tokens) if isinstance(tokens, list) else tokens
+    expr = " ".join(expr) if isinstance(expr, list) else expr
 
     expr = (
         expr.replace(const.EQUALS, "==")
@@ -18,43 +18,20 @@ def parse(tokens: list | str) -> bool:
         .replace(const.NOT, "!=")
         .replace(const.LOGICAL_AND, " and ")
         .replace(const.LOGICAL_OR, " or ")
-    )
-
-    # replaces ${variable} with the variable's value
-    re.sub(r"\${(\w+)}", lambda m: str(globals.variables.get(m.group(1), ['', '', ''])[2]), expr)
-
-    try:
-        return eval(expr, {}, globals.variables)
-    except Exception as e:
-        raise RuntimeError(f"error evaluating expression '{expr}': {e}")
-
-
-def evaluate(expr: str) -> any:
-    """
-    evaluates the expression using local functions
-    """
-    expr = (
-        expr.replace(const.ADD, " + ")
+        .replace(const.ADD, " + ")
         .replace(const.SUBTRACT, " - ")
         .replace(const.MULTIPLY, " * ")
         .replace(const.DIVIDE, " / ")
     )
 
-    tokens = re.findall(r'".*?"|\S+', expr)
-
-    for token in tokens:
-        if token.startswith('"') and not token.endswith('"'):
-            raise SyntaxError(f"mismatched quotes in (token)")
-        
-        if not token.startswith('"') and not re.match(r"\w+", token):
-            raise SyntaxError(f"no quotes found in {token}")
-    
-    # replaces ${variable} with variable value in strings
+    # replaces $(variable) with the variable's value
     expr = re.sub(r"\${(\w+)}", lambda m: str(globals.variables.get(m.group(1), ['', '', ''])[2]), expr)
 
+    varvals = {key: value[2] for key, value in globals.variables.items() if len(value) > 2}
+
     try:
-        return eval(expr, {}, {})
+        return eval(expr, {}, varvals)
     except NameError as e:
-        raise NameError(f"you didnt define a variable!!: {e}")
+        raise NameError(f"You didn't define a variable!!: {e}")
     except Exception as e:
-        raise RuntimeError(f"error evaluating expression {expr}: {e}")
+        raise RuntimeError(f"Error evaluating expression '{expr}': {e}")

@@ -36,8 +36,9 @@ def printnoline(tokens: list) -> None:
 
 def printline(tokens: list) -> None:
     tokens = [removequotes(token) for token in tokens]
-    if tokens[1] in globals.variables:
-        print(f"{globals.variables[tokens[2]][2]}{tokens[3:]}")
+
+    if tokens[2] in globals.variables:
+        print(f"{globals.variables[tokens[2]][2]}{' '.join(tokens[3:])}")
     else:
         print(f"{' '.join([re.sub(r"\${(\w+)}", 
                                   lambda m: str(globals.variables.get(m.group(1), ['', '', ''])[2]), 

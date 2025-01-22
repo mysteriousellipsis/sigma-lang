@@ -91,7 +91,7 @@ def reassignhandler(tokens: list) -> None:
         )
 
     varname = tokens[1]
-    varval = logic.parse(str(evaluate(" ".join(tokens[3:]))).split())
+    varval = logic.evaluate(" ".join(tokens[3:]))
 
     if varname not in globals.variables:
         raise KeyError(f"variable {varname} does not exist")
