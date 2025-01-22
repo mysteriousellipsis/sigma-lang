@@ -40,9 +40,5 @@ while (counter is greater than 0) do
     change counter to (counter minus 1)
 elihw
 
-print line "Testing for loop:"
-for (num in [1, 2, 3, 4, 5]) do
-    print line "Number: ${num}"
-rof
-
 <--  End of test file -->
+print "end of tests yippee"
