@@ -10,7 +10,7 @@ it tries to be very simple to understand and learn, especially for absolute begi
 head over to [syntax.md](https://github.com/mysteriousellipsis/sigma-lang/blob/main/SYNTAX.md) to read more
 
 # progress on stuff
-## impremented
+## implemented
 input output  
 variables  
 while loops  
