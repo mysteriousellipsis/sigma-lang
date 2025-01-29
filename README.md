@@ -1,5 +1,5 @@
 # sigma lang by dimini171
-potential rewrite coming soon to fix my spagetthi code  
+full rewrite coming soon to fix my spagetthi code  
 
 # what is this??
 sigma lang was made for our final year computing coursework.   
