@@ -13,7 +13,8 @@ OPSEQ = [
 
 def tokenize(code):
     tokens = []
-    # ai helped me with this im too stupi for regex
+    # done partly by ai 
+    # im too stupi for regex
     patternmap = {
         'STRING': r'"([^"]*)"',
         'FLOAT': r'\d+\.\d+',

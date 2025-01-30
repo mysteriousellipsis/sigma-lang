@@ -7,4 +7,5 @@ class Parser:
         self.tokens = tokens
         self.idx = 0
         
-    
+    def curr(self):
+        return self.tokens[self.pos] if self.pon < len(self.tokens) else None
