@@ -15,7 +15,7 @@ class Parser:
         '''
         return self.tokens[self.pos] if self.pos < len(self.tokens) else None
     
-    def consume(self, expected=None:
+    def consume(self, expected=None):
         token = self.curr()
         if not token:
             raise ParseError("unexpected eol")
@@ -95,7 +95,7 @@ class Parser:
         elsebod = []
         
         while self.curr() and self.curr()[0] in (ELIF.upper(), ELSE.upper()):
-            self.curr()[0] == ELIF.upper():
+            if self.curr()[0] == ELIF.upper():
                 self.consume()
                 elifcond = self.parseline()
                 self.consume(THEN.upper())
@@ -143,5 +143,18 @@ class Parser:
         return ("ASSIGN", varname, value)
     
     def expr(self):
-        # TODO
-        pass
+        token = self.consume()
+        if token[0] == "INTEGER":
+            return ("INTEGER", token[1])
+            
+        elif token[0] == "FLOAT":
+            return ("FLOAT", token[1])
+        
+        elif token[0] == "STRING":
+            return ("STRING", token[1])
+            
+        elif token[0] == "ID":
+            return ("VARIABLE", token[1])
+        
+        else:
+            raise ParseError(f"invalid expression {token}")
