@@ -46,14 +46,14 @@ class Evaluator:
         
         # TODO: add type checking
 
-        if varname in self.constants:
+        if varname in constants:
             raise RuntimeError(f"constant {varname} cannot be changed")
         
         if value is not None:
             variables[varname] = [value, vartype]
             
             if isconst:
-                constants.add(varname)
+                constants[varname] = vartype
     
     def ifelse(self, node):
         _, condition, body, elifs, elsebod = node
@@ -72,7 +72,7 @@ class Evaluator:
     def whileloop(self, node):
         _, condition, body = node
 
-        while self.evalcond(condition):
+        while self.evalexpr(condition):
             self.evaluate(body)
             
     def output(self, node):

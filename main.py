@@ -13,7 +13,7 @@ def validatefile(filename):
     
     firstline = code.split('\n', 1)
     
-    return firstline.strip() == '!>sigma'
+    return firstline[0].strip() == '!>sigma'
 
 def main(filename):
     with open(filename, 'r') as file:

@@ -7,7 +7,7 @@ class ParseError(Exception):
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
-        self.idx = 0
+        self.pos = 0
         
     def curr(self):
         '''
@@ -33,42 +33,32 @@ class Parser:
         return ast
 
     def parseline(self):
-        # TODO
         token = self.curr()
-        if token[0] == NEW_VAR_IDENT.upper():
-            return self.declaration()
-        
-        elif token[0] == IF_OPEN.upper():
-            return self.ifelse()
-        
-        elif token[0] == WHILE_OPEN.upper():
-            return self.whileloop()
-        
-        elif token[0] == OUTPUT.upper():
-            return self.output()
-        
-        elif token[0] == INPUT.upper():
-            return self.input()
-        
-        elif token[0] == 'ID':
-            return self.assignment()
-        
-        else:
-            raise(ParseError(f"unexpected token: {token[0]}"))
+        if token:
+            if token[0] == NEW_VAR_IDENT.upper():
+                return self.declaration()
+            
+            elif token[0] == IF_OPEN.upper():
+                return self.ifelse()
+            
+            elif token[0] == WHILE_OPEN.upper():
+                return self.whileloop()
+            
+            elif token[0] == OUTPUT.upper():
+                return self.output()
+            
+            elif token[0] == INPUT.upper():
+                return self.input()
+            
+            elif token[0] == 'ID':
+                return self.assignment()
+            
+            else:
+                raise ParseError(f"unexpected token: {token[0]}")
         
     def declaration(self):
         self.consume(NEW_VAR_IDENT.upper())
         isconst = False
-
-        if self.curr()[1] in CONST_TYPES:
-            self.consume()
-            isconst = True
-
-        elif self.curr()[1] in VAR_TYPES:
-            self.consume()
-        
-        else:
-            raise ParseError("expected variable or constant type")
             
         vartype = self.consume("ID")[1]
         varname = self.consume("ID")[1]
@@ -86,8 +76,9 @@ class Parser:
         condition = self.expr()
         self.consume(THEN.upper())
         self.consume(DO.upper())
-        
+    
         body = []
+        
         while self.curr() and self.curr()[0] not in (ELIF.upper(), ELSE.upper(), IF_CLOSE.upper()):
             body.append(self.parseline())
             
@@ -97,7 +88,7 @@ class Parser:
         while self.curr() and self.curr()[0] in (ELIF.upper(), ELSE.upper()):
             if self.curr()[0] == ELIF.upper():
                 self.consume()
-                elifcond = self.parseline()
+                elifcond = self.expr()
                 self.consume(THEN.upper())
                 self.consume(DO.upper())
                 elifbod = []
@@ -108,7 +99,7 @@ class Parser:
                 self.consume(ELSE.upper())
                 self.consume(DO.upper())
                 while self.curr() and self.curr()[0] != IF_CLOSE.upper():
-                    elsebod.apprend(self.parseline())
+                    elsebod.append(self.parseline())
         
         self.consume(IF_CLOSE.upper())
         return ("IF", condition, body, elifs, elsebod)

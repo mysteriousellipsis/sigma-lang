@@ -3,12 +3,12 @@ from const import *
 
 
 OPSEQ = [
-    ((EQUALS.split(), '=='),
-     (GTE.split(), '>='),
-     (LTE.split(), '<='),
-     (GREATER.split(), '>'),
-     (LESS.split(), '<'),
-     (NOT.split(), '!='))
+    (EQUALS.split(), '=='),
+    (GTE.split(), '>='),
+    (LTE.split(), '<='),
+    (GREATER.split(), '>'),
+    (LESS.split(), '<'),
+    (NOT.split(), '!=')
 ]
 
 def tokenize(code):
@@ -28,11 +28,11 @@ def tokenize(code):
         'MISMATCH': r'.',
     }
     
-    toxreg = '|'.join('(?P<%s>%s)' % (key, val) for key, val in patternmap.items())
+    toxreg = '|'.join(f'(?P<{key}>{val})' for key, val in patternmap.items())
 
-    for i in re.finditer(toxreg, code):
-        kind = i.lastgroup
-        value = i.group()
+    for match in re.finditer(toxreg, code):
+        kind = match.lastgroup
+        value = match.group()
 
         if kind == 'STRING':
             tokens.append(('STRING', value[1:-1]))
@@ -40,7 +40,7 @@ def tokenize(code):
             tokens.append(('FLOAT', float(value)))
         elif kind == 'INTEGER':
             tokens.append(('INTEGER', int(value)))
-        elif kind == 'KEYWORD' or kind == 'TYPE':
+        elif kind in ['KEYWORD', 'TYPE']:
             tokens.append((value.upper(), value))
         elif kind == 'OPERATOR':
             tokens.append((value, value))
@@ -57,7 +57,7 @@ def tokenize(code):
     while i < len(tokens):
         for seqwords, op in OPSEQ:
             if tokens[i:i+len(seqwords)] == [('ID', word) for word in seqwords]:
-                tokens[i:i+seqwords] = [('OPERATOR', op)]
+                tokens[i:i+len(seqwords)] = [('OPERATOR', op)]
                 break
         i += 1
 
