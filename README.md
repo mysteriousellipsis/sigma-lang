@@ -1,4 +1,4 @@
-# sigma lang by dimini171
+# sigma by dimini171
 full rewrite coming soon to fix my spagetthi code  
 
 # what is this??
