@@ -1,13 +1,13 @@
 # sigma lang by dimini171
-full rewrite coming soon to fix my spagetthi code  
+rewrite (in progress) can be found [here](https://github.com/dimini171/sigma/tree/v2)  
 
 # what is this??
 sigma lang was made for our final year computing coursework.   
-it aims to be a wrapper for python with a slightly edited syntax. 
-it tries to be very simple to understand and learn, especially for absolute beginners and people who want to pick up programming, but find it too confusing or difficult.  
+it aims to be a wrapper for python with a slightly edited syntax.  
+it tries to be very simple to understand and learn, especially for absolute beginners and people who  want to pick up programming, but find it too confusing or difficult.  
 
 # syntax
-head over to [syntax.md](https://github.com/mysteriousellipsis/sigma-lang/blob/main/SYNTAX.md) to read more
+head over to [syntax.md](https://github.com/mysteriousellipsis/sigma/blob/v1/SYNTAX.md) to read more
 
 # progress on stuff
 ## implemented
