@@ -114,16 +114,34 @@ class Parser:
         return ("IF", condition, body, elifs, elsebod)
 
     def whileloop(self):
-        pass
+        self.consume(WHILE_OPEN.upper())
+        condition = self.expr()
+        self.consume(DO.upper())
+        body = []
+        
+        while self.curr() and self.curr()[0] != WHILE_CLOSE.upper():
+            body.append(self.parseline())
+        
+        self.consume(WHILE_CLOSE.upper())
+        
+        return ("WHILE", condition, body)
         
     def output(self):
-        pass
+        self.consume(OUTPUT.upper())
+        value = self.expr()
+        return ("PRINT", value)
         
     def input(self):
-        pass
+        self.consume(INPUT.upper())
+        varname = self.consume("ID")[1]
+        return ("RECEIVE", varname)
         
     def assignment(self):
-        pass
+        varname = self.consume("ID")[1]
+        self.consume(REASSIGNMENT_OPERATOR.upper())
+        value = self.expr()
+        return ("ASSIGN", varname, value)
     
     def expr(self):
+        # TODO
         pass
