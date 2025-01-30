@@ -82,7 +82,36 @@ class Parser:
         return ("DECLARE", varname, vartype, value, isconst)
 
     def ifelse(self):
-        pass
+        self.consume(IF_OPEN.upper())
+        condition = self.expr()
+        self.consume(THEN.upper())
+        self.consume(DO.upper())
+        
+        body = []
+        while self.curr() and self.curr()[0] not in (ELIF.upper(), ELSE.upper(), IF_CLOSE.upper()):
+            body.append(self.parseline())
+            
+        elifs = []
+        elsebod = []
+        
+        while self.curr() and self.curr()[0] in (ELIF.upper(), ELSE.upper()):
+            self.curr()[0] == ELIF.upper():
+                self.consume()
+                elifcond = self.parseline()
+                self.consume(THEN.upper())
+                self.consume(DO.upper())
+                elifbod = []
+                while self.curr() and self.curr()[0] not in (ELIF.upper(), ELSE.upper(), IF_CLOSE.upper()):
+                    elifbod.append(self.parseline())
+                elifs.append((elifcond, elifbod))
+            else:
+                self.consume(ELSE.upper())
+                self.consume(DO.upper())
+                while self.curr() and self.curr()[0] != IF_CLOSE.upper():
+                    elsebod.apprend(self.parseline())
+        
+        self.consume(IF_CLOSE.upper())
+        return ("IF", condition, body, elifs, elsebod)
 
     def whileloop(self):
         pass
