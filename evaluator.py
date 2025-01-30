@@ -32,7 +32,7 @@ class Evaluator:
             self.assign(node)
 
         else:
-            raise RuntimeError(f"unknown node type: {node[0]}\n this is most likely a problem with sigmalang. please open an issue at https://github.com/dimini171/sigma/issues")
+            raise RuntimeError(f"unknown node type: {node[0]}\n this is most likely a problem with sigma. please open an issue at https://github.com/dimini171/sigma/issues")
         
     def evalcond(self, condition):
         '''
@@ -116,4 +116,4 @@ class Evaluator:
             return variables[expr[1]]
 
         else:
-            raise RuntimeError(f"unknown expression type: {expr[0]}\n this is most likely a problem with sigmalang. please open an issue at https://github.com/dimini171/sigma/issues")
+            raise RuntimeError(f"unknown expression type: {expr[0]}\n this is most likely a problem with sigma. please open an issue at https://github.com/dimini171/sigma/issues")
