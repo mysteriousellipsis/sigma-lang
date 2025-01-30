@@ -20,19 +20,19 @@ class Evaluator:
             self.ifelse(node)
         
         elif node[0] == "WHILE":
-            pass
+            self.whileloop(node)
 
         elif node[0] == "PRINT":
-            pass
+            self.output(node)
 
         elif node[0] == "RECEIVE":
-            pass
+            self.receive(node)
 
         elif node[0] == "ASSIGN":
-            pass
+            self.assign(node)
 
         else:
-            raise RuntimeError(f"unknown node type: {node[0]}")
+            raise RuntimeError(f"unknown node type: {node[0]}\n this is most likely a problem with sigmalang. please open an issue at https://github.com/dimini171/sigma/issues")
         
     def evalcond(self, condition):
         '''
@@ -64,7 +64,7 @@ class Evaluator:
         
         for elifcond, elifbod in elifs:
             if self.evalcond(elifcond):
-                self.evaluate(body)
+                self.evaluate(elifbod)
                 return
             
         self.evaluate(elsebod)
@@ -98,3 +98,22 @@ class Evaluator:
             variables[name][0] = value
         except:
             print(f"variable {name} does not exist. ")
+            
+    def evalexpr(self, expr):
+        if expr[0] == "INTEGER":
+            return int(expr[1])
+        
+        elif expr[0] == "FLOAT":
+            return float(expr[1])
+        
+        elif expr[0] == "STRING":
+            return str(expr[1])
+        
+        elif expr[0] == "VARIABLE":
+            if expr[1] not in variables:
+                raise RuntimeError(f"variable {expr[1]} is undefined")
+            
+            return variables[expr[1]]
+
+        else:
+            raise RuntimeError(f"unknown expression type: {expr[0]}\n this is most likely a problem with sigmalang. please open an issue at https://github.com/dimini171/sigma/issues")
