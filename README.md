@@ -1,5 +1,5 @@
-# sigma lang by dimini171
-potential rewrite coming soon to fix my spagetthi code  
+# sigma by dimini171
+full rewrite coming soon to fix my spagetthi code  
 
 # what is this??
 sigma lang was made for our final year computing coursework.   
@@ -10,7 +10,7 @@ it tries to be very simple to understand and learn, especially for absolute begi
 head over to [syntax.md](https://github.com/mysteriousellipsis/sigma-lang/blob/main/SYNTAX.md) to read more
 
 # progress on stuff
-## impremented
+## implemented
 input output  
 variables  
 while loops  
