@@ -67,10 +67,30 @@ class Evaluator:
             self.evaluate(node["body"])
         
     def output(self, node):
-        print(f"output {node}")
+        value = self.evalexpr(node["value"])
+        print(value)
         
     def receive(self, node):
-        print(f"output: {node}")
+        target = node["target"]
+        if target not in self.variables:
+            raise RuntimeError(f"undefined variable {target}")
+        
+        usrinp = input()
+        
+        exptype = self.variables[target][1]
+        
+        try:
+            if exptype == "int":
+                self.variables[target][0] = int(usrinp)
+                
+            elif exptype == "float":
+                self.variables[target][0] = float(usrinp)
+                
+            else:
+                self.variables[target][0] = usrinp
+
+        except ValueError:
+            raise RuntimeError(f"input should be {exptype} but wrong type was provided")
         
     def reassign(self, node):
         print(f"reassign {node}")
