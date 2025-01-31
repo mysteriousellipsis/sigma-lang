@@ -35,4 +35,53 @@ class Parser:
         return ast
     
     def parseline(self):
+        token = self.curr()
+        
+        if not token:
+            return None
+        
+        if token.type == "NEW_VAR_IDENT":
+            return self.decl()
+        
+        if token.type == "IF_OPEN":
+            return self.ifelse()
+        
+        if token.type == "WHILE_OPEN":
+            return self.whileloop()
+        
+        if token.type == "OUTPUT":
+            return self.output()
+        
+        if token.type == "INPUT":
+            return self.receive()
+        
+        if token.type == "REASSIGNMENT_IDENT":
+            return self.reassign()
+        
+        if token.type == "ID":
+            return self.expr()
+        
+        else:
+            raise ParseError(f"unexpected token {token}\nthis is most likely a problem with sigma. open an issue at https://github.com/dimini171/sigma/issues/new")
+        
+    
+    def decl(self):
+        pass
+
+    def ifelse(self):
+        pass
+
+    def whileloop(self):
+        pass
+
+    def output(self):
+        pass
+
+    def receive(self):
+        pass
+
+    def reassign(self):
+        pass
+
+    def expr(self):
         pass
