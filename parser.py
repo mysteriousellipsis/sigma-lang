@@ -30,7 +30,8 @@ class Parser:
         ast = []
         
         while self.curr():
-            ast.append(self.parseline)
+            print(ast)
+            ast.append(self.parseline())
             
         return ast
     
@@ -105,10 +106,14 @@ class Parser:
         pass
 
     def output(self):
-        pass
+        self.consume("OUTPUT")
+        value = self.expr()
+        return {"type": "input", "value": value}
 
     def receive(self):
-        pass
+        self.consume("INPUT")
+        target = self.consume("ID").value
+        return {"type": "input", "target": target}
 
     def reassign(self):
         pass
@@ -127,3 +132,13 @@ class Parser:
         
         else:
             raise ParseError(f"invalid expression token {token.type}")
+
+from lexer import *
+
+lexer = Lexer("new var int variablename is 1")
+
+lexed = lexer.tokenize()
+
+parser = Parser(lexed)
+
+print(f"ast: {parser.parse()}")

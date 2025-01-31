@@ -63,7 +63,7 @@ class Lexer:
                 type__ = keywordsinv[word]
                 
                 if type__ in KEYWORDS['TYPE']:
-                    tokens.append(Token(type__, word))
+                    tokens.append(Token('TYPE', word))
             
                 else:
                     tokens.append(Token(type__))
