@@ -76,6 +76,6 @@ class Lexer:
         return tokens
     
 
-lexer = Lexer("new var int variablename is 1")
-print(lexer.tokenize())
-        
+# lexer = Lexer("new var int variablename is 1")
+# print(lexer.tokenize())
+# outputs `[NEW_VAR_IDENT, VAR, INTEGER:int, ID:variablename, ASSIGNMENT_OPERATOR, INT:1]`
