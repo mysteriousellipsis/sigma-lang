@@ -3,7 +3,8 @@ from globals import *
 
 class Evaluator:
     def __init__(self):
-        pass
+        self.variables = variables
+        self.constants = constants
 
     def evaluate(self, ast):
         for node in ast:
@@ -34,7 +35,19 @@ class Evaluator:
             raise RuntimeError(f"unknown node type {type_}\nthis is most likely a problem with sigmalang. open an issue at https://github.com/dimini171/sigma/issues/new")
         
     def decl(self, node):
-        print(f"declaration {node}")
+        varname = node["name"]
+        vartype = node["vartype"]
+        isconst = node["isconst"]
+        value = node["value"]
+        
+        if varname in self.constants:
+            raise RuntimeError(f"constant {varname} cannot be reassigned")
+        
+        if value is not None:
+            evaledval = self.evalexpr(value)
+            self.variables[varname] = [evaledval, vartype]
+            if isconst:
+                self.constants[varname] = vartype
         
     def ifelse(self, node):
         print(f"if {node}")
@@ -50,6 +63,9 @@ class Evaluator:
         
     def reassign(self, node):
         print(f"reassign {node}")
+        
+    def evalexpr(self, expr):
+        pass
   
 from lexer import *
 from parser import *
