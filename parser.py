@@ -193,6 +193,17 @@ class Parser:
         }
 
     def expr(self):
+        token = self.curr()
+        
+        if not token:
+            raise ParseError(f"unexpected eol")
+        
+        if token.type == "LEFT_BRACKET":
+            self.consume("LEFT_BRACKET")
+            condition = self.expr()
+            self.consume("RIGHT_BRACKET")
+            return condition
+        
         token = self.consume()
         
         if token.type in {"INT", "FLOAT"}:
@@ -221,7 +232,7 @@ class Parser:
 
 from lexer import *
 
-lexer = Lexer("new var int variablename is 1")
+lexer = Lexer("if ('hello' == 'hello') then do print 'match' fi")
 
 lexed = lexer.tokenize()
 parser = Parser(lexed)
