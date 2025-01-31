@@ -228,16 +228,3 @@ class Parser:
         
         else:
             raise ParseError(f"invalid expression token {token.type}")
-
-
-from lexer import *
-
-lexer = Lexer('print "some text"')
-
-lexed = lexer.tokenize()
-
-print(f"tokens: {lexed}")
-
-parser = Parser(lexed)
-
-print(f"ast: {parser.parse()}")

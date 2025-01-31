@@ -10,6 +10,23 @@ for k,v in KEYWORDS.items():
         continue
     else:
         keywordsinv[v] = k
+        
+keywords = []
+
+for phrase in keywordsinv.keys():
+    keywords.append(phrase)
+    
+keywords.sort(key=lambda x: len(x), reverse=True)
+escapedkw = [re.escape(kw) for kw in keywords]
+kwpattern = '|'.join(escapedkw)
+
+pattern = fr'''
+            ("[^"]*"|'[^']*')|          # Quoted strings
+            ({kwpattern})|        # Multi-word keywords
+            ([()])|                     # Brackets
+            (\w+)|                      # Words (identifiers, numbers)
+            ([^\s\w])                   # Other symbols
+        '''
 
 class Token:
     def __init__(self, type_, value=None):
@@ -25,10 +42,9 @@ class Lexer:
     def __init__(self, text):
         self.text = text
         self.pos = 0
-        self.words = re.findall(r'("[^"]*"|\'[^\']*\')|([()])|(\w+)|([^\s\w])', text, re.VERBOSE)
+        self.words = re.findall(pattern, text, re.VERBOSE)
         self.words = [next(group for group in match if group) for match in self.words]
         self.currword = self.words[self.pos] if self.pos < len(self.words) else None
-        print(f"words: {self.words}")
 
     def next(self):
         self.pos += 1
@@ -50,16 +66,19 @@ class Lexer:
         while self.currword is not None:
             word = self.currword
             
-            print(f"word: {word}")
+            if word.startswith('"') and word.endswith('"') or word.startswith("'") and word.endswith("'"):
+                tokens.append(Token('ID', word[1:-1]))
             
             if word == '(':
                 tokens.append(Token('LEFT_BRACKET'))
                 
-            elif word == ')':
+            if word == ')':
                 tokens.append(Token('RIGHT_BRACKET'))
-            
-            elif word.startswith('"') and word.endswith('"') or word.startswith("'") and word.endswith("'"):
-                tokens.append(Token('ID', word[1:-1]))
+                
+            if word in keywordsinv:
+                tokens.append(Token(keywordsinv[word]))
+                self.next()
+                continue
             
             elif word in KEYWORDS['BOOL_TYPES']:
                 tokens.append(Token('BOOL', word))
@@ -72,15 +91,6 @@ class Lexer:
                 
             elif self.isfloat(word):
                 tokens.append(Token("FLOAT", word))
-                
-            elif word in keywordsinv:
-                type__ = keywordsinv[word]
-                
-                if word in {v for k in KEYWORDS['TYPE'] for v in [KEYWORDS[k]]}:
-                    tokens.append(Token('TYPE', word))
-            
-                else:
-                    tokens.append(Token(type__))
             
             else:
                 tokens.append(Token("ID", word))
