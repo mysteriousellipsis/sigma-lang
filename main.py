@@ -4,35 +4,65 @@ from parser import *
 from evaluator import *
 
 def validatefile(filename):
-    if filename.endswith('.sigma'):
-        return True
-    
-    with open(filename, 'r') as file:
-        code = file.read()
+    try:
+        if filename.endswith('.sigma'):
+            return True
         
-    
-    firstline = code.split('\n', 1)
-    
-    return firstline[0].strip() == '!>sigma'
-
-def main(filename):
-    with open(filename, 'r') as file:
-        code = file.read()
+        with open(filename, 'r') as file:
+            code = file.read()
+            
         
-    tokens = tokenize(code)
-    parser = Parser(tokens)
-    ast = parser.parse()
-    evaluator = Evaluator()
-    evaluator.evaluate(ast)
+        firstline = code.split('\n', 1)
+        
+        return firstline[0].strip() == '!>sigma'
+    
+    except FileNotFoundError:
+        print(f"file {filename} not found")
+        return False
+    
+    except Exception as e:
+        print(f"error validating file: {e}")
+        return False
 
-args = sys.argv
-
-if len(args) < 2:
-    # if user runs `sigma`
-    # potential shell?
-    print("run sigma <filename>.sigma to run a script")
-    sys.exit()
-
-for filename in args[1:]:
-    validatefile(filename)
-    main(filename)
+def runfile(filename):
+    try:
+        with open(filename, 'r') as file:
+            code = file.read()
+            
+        lexer = Lexer(code)
+        tokens = lexer.tokenize()
+        
+        parser = Parser(tokens)
+        ast = parser.parse()
+        
+        evaluator = Evaluator()
+        evaluator.evaluate(ast)
+    
+    except FileNotFoundError:
+        print(f"error: {filename} not found")
+        
+    except Exception as e:
+        print(f"error executing {filename}: {e}")
+        sys.exit()
+        
+def main():
+    if len(sys.argv) < 2:
+        print("sigma intepreter")
+        print("usage: sigma <file.sigma> [additional files]")
+        print("       sigma <file.sigma>")
+        print()
+        sys.exit()
+        
+    for filename in sys.argv[1:]:
+        if not validatefile(filename):
+            continue
+        
+        try:
+            runfile(filename)
+        
+        except KeyboardInterrupt:
+            print(f"\n Execution interrupted by user")
+            sys.exit()
+            
+if __name__ == "__main__":
+    main()
