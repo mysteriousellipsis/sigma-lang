@@ -44,22 +44,22 @@ class Parser:
         if token.type == "NEW_VAR_IDENT":
             return self.decl()
         
-        if token.type == "IF_OPEN":
+        elif token.type == "IF_OPEN":
             return self.ifelse()
         
-        if token.type == "WHILE_OPEN":
+        elif token.type == "WHILE_OPEN":
             return self.whileloop()
         
-        if token.type == "OUTPUT":
+        elif token.type == "OUTPUT":
             return self.output()
         
-        if token.type == "INPUT":
+        elif token.type == "INPUT":
             return self.receive()
         
-        if token.type == "REASSIGNMENT_IDENT":
+        elif token.type == "REASSIGNMENT_IDENT":
             return self.reassign()
         
-        if token.type == "ID":
+        elif token.type == "ID":
             return self.expr()
         
         else:
@@ -232,9 +232,12 @@ class Parser:
 
 from lexer import *
 
-lexer = Lexer("if ('hello' == 'hello') then do print 'match' fi")
+lexer = Lexer('print "some text"')
 
 lexed = lexer.tokenize()
+
+print(f"tokens: {lexed}")
+
 parser = Parser(lexed)
 
 print(f"ast: {parser.parse()}")

@@ -25,8 +25,10 @@ class Lexer:
     def __init__(self, text):
         self.text = text
         self.pos = 0
-        self.words = re.findall(r'"[^"]*"|\(|\)|\w+|[^\s\w]', text)
+        self.words = re.findall(r'("[^"]*"|\'[^\']*\')|([()])|(\w+)|([^\s\w])', text, re.VERBOSE)
+        self.words = [next(group for group in match if group) for match in self.words]
         self.currword = self.words[self.pos] if self.pos < len(self.words) else None
+        print(f"words: {self.words}")
 
     def next(self):
         self.pos += 1
@@ -48,6 +50,8 @@ class Lexer:
         while self.currword is not None:
             word = self.currword
             
+            print(f"word: {word}")
+            
             if word == '(':
                 tokens.append(Token('LEFT_BRACKET'))
                 
@@ -55,7 +59,7 @@ class Lexer:
                 tokens.append(Token('RIGHT_BRACKET'))
             
             elif word.startswith('"') and word.endswith('"') or word.startswith("'") and word.endswith("'"):
-                tokens.append(Token('STRING', word[1:-1]))
+                tokens.append(Token('ID', word[1:-1]))
             
             elif word in KEYWORDS['BOOL_TYPES']:
                 tokens.append(Token('BOOL', word))
