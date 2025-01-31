@@ -1,7 +1,7 @@
-# THIS IS **NOT** A FINISHED PRODUCT. A (barely) WORKING PROTOTYPE CAN BE FOUND [HERE](https://github.com/dimini171/sigma/tree/v1)
-
 # sigma by dimini171
 rewrite of the [original](https://github.com/dimini171/sigma/tree/v1), now more like an actual language than a preprocessor. 
+
+**this version of sigma is untested. a stable version can be found [here](https://github.com/dimini171/sigma/tree/v1)**
 
 ## what is this??
 sigma lang was made for our final year computing coursework.   
@@ -20,4 +20,4 @@ evaluator
 parser  
 
 ### roadmap
-nothing for now
+f strings
