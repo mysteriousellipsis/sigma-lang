@@ -30,7 +30,6 @@ class Parser:
         ast = []
         
         while self.curr():
-            print(ast)
             ast.append(self.parseline())
             
         return ast
@@ -219,6 +218,13 @@ class Parser:
                 "valtype": "bool",
                 "value": token.value == "true"
             }
+            
+        elif token.type == "STRING":
+            return {
+                "type": "literal",
+                "valtype": "string",
+                "value": token.value
+            }
         
         elif token.type == "ID":
             return {
@@ -228,3 +234,19 @@ class Parser:
         
         else:
             raise ParseError(f"invalid expression token {token.type}")
+
+from lexer import *
+
+test = "print 'some text'"
+
+print(f"test code: {test}")
+
+lexer = Lexer(test)
+tokens = lexer.tokenize()
+
+print(f"tokens: {tokens}")
+
+parser = Parser(tokens)
+parsed = parser.parse()
+
+print(f"parsed: {parsed}")

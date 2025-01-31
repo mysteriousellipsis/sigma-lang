@@ -1,4 +1,3 @@
-# ai generated tests
 from lexer import Lexer, Token
 
 def run_lexer_test(test_name, input_str, expected_tokens):
@@ -29,14 +28,14 @@ if __name__ == "__main__":
     test1_expected = [
         Token('IF_OPEN'), 
         Token('LEFT_BRACKET'),
-        Token('ID', 'hello'),
+        Token('STRING', 'hello'),
         Token('EQUALS'),  # "is equal to"
-        Token('ID', 'hello'),
+        Token('STRING', 'hello'),
         Token('RIGHT_BRACKET'),
         Token('THEN'),
         Token('DO'),
         Token('OUTPUT'),
-        Token('ID', 'multi word string'),
+        Token('STRING', 'multi word string'),
         Token('IF_CLOSE')
     ]
     run_lexer_test("Basic string and operator recognition", test1_input, test1_expected)
@@ -47,11 +46,11 @@ if __name__ == "__main__":
         Token('WHILE_OPEN'),
         Token('ID', 'x'),
         Token('GREATER'),  # "is greater than"
-        Token('ID', '5'),
+        Token('INT', '5'),
         Token('DIVIDE'),   # "divided by"
-        Token('ID', '2'),
+        Token('INT', '2'),
         Token('MULTIPLY'), # "multiplied by"
-        Token('ID', '3')
+        Token('INT', '3')
     ]
     run_lexer_test("Mathematical operators", test2_input, test2_expected)
 
@@ -63,7 +62,7 @@ if __name__ == "__main__":
         Token('STRING'),
         Token('ID', 'test'),
         Token('ASSIGNMENT_OPERATOR'),
-        Token('ID', "contains 'nested' quotes")
+        Token('STRING', "contains 'nested' quotes")
     ]
     run_lexer_test("Nested quotes", test3_input, test3_expected)
 
@@ -76,12 +75,12 @@ if __name__ == "__main__":
         Token('ID', 'x'),
         Token('ASSIGNMENT_OPERATOR'),
         Token('LEFT_BRACKET'),
-        Token('ID', '5'),
+        Token('INT', '5'),
         Token('DIVIDE'),
-        Token('ID', '2.5'),
+        Token('FLOAT', '2.5'),
         Token('RIGHT_BRACKET'),
         Token('LESS'),  # "is less than"
-        Token('ID', '3')
+        Token('INT', '3')
     ]
     run_lexer_test("Mixed types and operators", test4_input, test4_expected)
 

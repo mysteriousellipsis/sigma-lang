@@ -46,7 +46,6 @@ class Lexer:
         self.words = re.findall(pattern, text, re.VERBOSE)
         self.words = [next(group for group in match if group) for match in self.words]
         self.currword = self.words[self.pos] if self.pos < len(self.words) else None
-        print(self.words)
 
     def next(self):
         self.pos += 1
@@ -69,7 +68,7 @@ class Lexer:
             word = self.currword
             
             if word.startswith('"') and word.endswith('"') or word.startswith("'") and word.endswith("'"):
-                tokens.append(Token('ID', word[1:-1]))
+                tokens.append(Token('STRING', word[1:-1]))
                 self.next()
                 continue
             
@@ -84,7 +83,6 @@ class Lexer:
                 continue
                 
             if word in keywordsinv:
-                print(word)
                 tokens.append(Token(keywordsinv[word]))
                 self.next()
                 continue
@@ -107,8 +105,3 @@ class Lexer:
             self.next()
             
         return tokens
-    
-
-# lexer = Lexer("new var int variablename is 1")
-# print(lexer.tokenize())
-# outputs `[NEW_VAR_IDENT, VAR, :int, ID:variablename, ASSIGNMENT_OPERATOR, INT:1]`
