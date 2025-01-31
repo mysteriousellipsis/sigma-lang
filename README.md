@@ -1,7 +1,7 @@
 # sigma by dimini171
 rewrite of the [original](https://github.com/dimini171/sigma/tree/v1), now more like an actual language than a preprocessor. 
 
-**this version of sigma is untested. a stable version can be found [here](https://github.com/dimini171/sigma/tree/v1)**
+**this version of sigma is undergoing testing. a stable version can be found [here](https://github.com/dimini171/sigma/tree/v1)**
 
 ## known issues
 if else statements dont work due to some problems with how the code is interpreted
