@@ -50,7 +50,17 @@ class Evaluator:
                 self.constants[varname] = vartype
         
     def ifelse(self, node):
-        print(f"if {node}")
+        condition = self.evalcond(node["condition"])
+        if condition:
+            self.evaluate(node["body"])
+            return
+        
+        for elifcond, elifbody in node["elifs"]:
+            if self.evalcond(elifcond):
+                self.evaluate(elifbody)
+                return
+            
+        self.evaluate(node["elsebody"])
         
     def whileloop(self, node):
         print(f"while {node}")
@@ -65,6 +75,9 @@ class Evaluator:
         print(f"reassign {node}")
         
     def evalexpr(self, expr):
+        pass
+    
+    def evalcond(self, cond):
         pass
   
 from lexer import *
