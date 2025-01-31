@@ -32,7 +32,6 @@ class Parser:
         
         while self.curr():
             ast.append(self.parseline())
-            self.pos += 1
             
         return ast
     
@@ -64,6 +63,7 @@ class Parser:
             return self.expr()
         
         elif token.type == "COMMENT_OPEN":
+            self.consume("COMMENT_OPEN")
             return None
         
         else:
@@ -104,10 +104,7 @@ class Parser:
         }
 
     def ifelse(self):
-        body = []
-        elifs = []
-        elsebody = []
-
+        print(self.tokens)
         self.consume("IF_OPEN")        
         condition = self.evalcond()
         self.consume("THEN")
@@ -115,9 +112,15 @@ class Parser:
         
         body = []
         while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
+            print(self.tokens)
             body.append(self.parseline())
+            
+        elifs = []
+        elsebody = []
         
-        while self.curr() and self.curr().type in "ELIF":
+        print(self.tokens)
+        while self.curr() and self.curr().type == "ELIF":
+            print("elif detected")
             self.consume("ELIF")
             elifcond = self.evalcond()
             self.consume("THEN")
@@ -130,6 +133,7 @@ class Parser:
             elifs.append((elifcond, elifbody))
         
         if self.curr() and self.curr().type == "ELSE":
+            print("else detected")
             self.consume("ELSE")
             self.consume("DO")
             while self.curr() and self.curr().type != "IF_CLOSE":
@@ -137,7 +141,6 @@ class Parser:
         
         try:
             self.consume("IF_CLOSE")
-        
         except ParseError:
             print(f"{KEYWORDS['IF_CLOSE']} not found.")
             
