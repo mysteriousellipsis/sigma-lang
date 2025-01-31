@@ -62,7 +62,7 @@ class Lexer:
             elif word in keywordsinv:
                 type__ = keywordsinv[word]
                 
-                if type__ in KEYWORDS['TYPE']:
+                if word in {v for k in KEYWORDS['TYPE'] for v in [KEYWORDS[k]]}:
                     tokens.append(Token('TYPE', word))
             
                 else:
@@ -78,4 +78,4 @@ class Lexer:
 
 # lexer = Lexer("new var int variablename is 1")
 # print(lexer.tokenize())
-# outputs `[NEW_VAR_IDENT, VAR, INTEGER:int, ID:variablename, ASSIGNMENT_OPERATOR, INT:1]`
+# outputs `[NEW_VAR_IDENT, VAR, :int, ID:variablename, ASSIGNMENT_OPERATOR, INT:1]`

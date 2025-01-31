@@ -100,11 +100,53 @@ class Parser:
         }
 
     def ifelse(self):
-        pass
+        self.consume("IF_OPEN")
+        condition = self.expr()
+        self.consume("THEN")
+        self.consume("DO")
+        
+        body = []
+        while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
+            body.append(self.parseline())
+            
+        elifs = []
+        elsebody = []
+        
+        while self.curr() and self.curr().type in {"ELIF", "ELSE"}:
+            if self.curr().type == "ELIF":
+                self.consume("ELIF")
+                elifcond = self.expr()
+                self.consume("THEN")
+                self.consume("DO")
+                elifbody = []
+                while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
+                    elifbody.append(self.parseline())
+                
+                elifs.append((elifcond, elifbody))
+            
+            if self.curr().type == "ELSE":
+                self.consume("ELSE")
+                self.consume("DO")
+                while self.curr() and self.curr().type != "IF_CLOSE":
+                    elsebody.append(self.parseline())
+        
+        try:
+            self.consume("IF_CLOSE")
+        
+        except:
+            print(f"{KEYWORDS['IF_CLOSE']} not found.")
+            
+        return {
+            "type": "if",
+            "condition": condition,
+            "body": body,
+            "elifs": elifs,
+            "elsebody": elsebody
+        }
 
     def whileloop(self):
         self.consume("WHILE_OPEN")
-        condition = self.parse_expression()
+        condition = self.expr()
         self.consume("DO")
         
         body = []
@@ -125,7 +167,7 @@ class Parser:
         value = self.expr()
         
         return {
-            "type": "input", 
+            "type": "output", 
             "value": value
         }
 
@@ -139,7 +181,16 @@ class Parser:
         }
 
     def reassign(self):
-        pass
+        self.consume("REASSIGNMENT_IDENT")
+        varname = self.consume("ID").value
+        self.consume("REASSIGNMENT_OPERATOR")
+        value = self.expr()
+        
+        return {
+            "type": "reassignment",
+            "name": varname,
+            "value": value
+        }
 
     def expr(self):
         token = self.consume()
@@ -147,13 +198,15 @@ class Parser:
         if token.type in {"INT", "FLOAT"}:
             return {
                 "type": "literal", 
-                "type": token.type, "value": token.value
+                "valtype": token.type, 
+                "value": token.value
             }
         
         elif token.type == "BOOL":
             return {
                 "type": "literal", 
-                "type": token.value == "true"
+                "valtype": "bool",
+                "value": token.value == "true"
             }
         
         elif token.type == "ID":
