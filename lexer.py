@@ -18,14 +18,15 @@ for phrase in keywordsinv.keys():
     
 keywords.sort(key=lambda x: len(x), reverse=True)
 escapedkw = [re.escape(kw) for kw in keywords]
-kwpattern = '|'.join(escapedkw)
+kwpattern = '|'.join(escapedkw)\
 
 pattern = fr'''
-            ("[^"]*"|'[^']*')|          # Quoted strings
-            ({kwpattern})|        # Multi-word keywords
-            ([()])|                     # Brackets
-            (\w+)|                      # Words (identifiers, numbers)
-            ([^\s\w])                   # Other symbols
+            ("[^"]*"|'[^']*')|
+            ({kwpattern})|
+            ([()])|
+            (\d+\.\d+|\.\d+|\d+)|
+            (\w+)|
+            ([^\s\w])
         '''
 
 class Token:
@@ -45,6 +46,7 @@ class Lexer:
         self.words = re.findall(pattern, text, re.VERBOSE)
         self.words = [next(group for group in match if group) for match in self.words]
         self.currword = self.words[self.pos] if self.pos < len(self.words) else None
+        print(self.words)
 
     def next(self):
         self.pos += 1
@@ -68,14 +70,21 @@ class Lexer:
             
             if word.startswith('"') and word.endswith('"') or word.startswith("'") and word.endswith("'"):
                 tokens.append(Token('ID', word[1:-1]))
+                self.next()
+                continue
             
             if word == '(':
                 tokens.append(Token('LEFT_BRACKET'))
+                self.next()
+                continue
                 
             if word == ')':
                 tokens.append(Token('RIGHT_BRACKET'))
+                self.next()
+                continue
                 
             if word in keywordsinv:
+                print(word)
                 tokens.append(Token(keywordsinv[word]))
                 self.next()
                 continue
