@@ -1,7 +1,5 @@
 pip3 install -U PyInstaller
 
-echo "purging ./dist/"
-rm -rf dist/
 echo "purging ./build/"
 rm -rf build/
 
