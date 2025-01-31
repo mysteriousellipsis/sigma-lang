@@ -32,7 +32,7 @@ class Evaluator:
             self.reassign(node)
         
         else:
-            raise RuntimeError(f"unknown node type {type_}\nthis is most likely a problem with sigmalang. open an issue at https://github.com/dimini171/sigma/issues/new")
+            raise RuntimeError(f"unknown node type {type_} {syserr}")
         
     def decl(self, node):
         varname = node["name"]
@@ -50,20 +50,21 @@ class Evaluator:
                 self.constants[varname] = vartype
         
     def ifelse(self, node):
-        condition = self.evalcond(node["condition"])
+        condition = self.evalexpr(node["condition"])
         if condition:
             self.evaluate(node["body"])
             return
         
         for elifcond, elifbody in node["elifs"]:
-            if self.evalcond(elifcond):
+            if self.evalexpr(elifcond):
                 self.evaluate(elifbody)
                 return
             
         self.evaluate(node["elsebody"])
         
     def whileloop(self, node):
-        print(f"while {node}")
+        while self.evalexpr(node["condition"]):
+            self.evaluate(node["body"])
         
     def output(self, node):
         print(f"output {node}")
@@ -75,10 +76,30 @@ class Evaluator:
         print(f"reassign {node}")
         
     def evalexpr(self, expr):
-        pass
-    
-    def evalcond(self, cond):
-        pass
+        if expr["type"] == "literal":
+            if expr["valtype"] == "string":
+                return expr["value"]
+            
+            try:
+                if expr["valtype"] == "INT":
+                    return int(expr["value"])
+                
+                elif expr["valtype"] == "FLOAT":
+                    return float(expr["value"])
+                
+                else:
+                    return expr["value"]
+            
+            except:
+                return expr["value"]
+
+        elif expr["type"] == "variable":
+            if expr["name"] in self.variables:
+                return self.variables[expr["name"]][0]
+            raise RuntimeError(f"undefined variable {expr["name"]}")
+        
+        else:
+            raise RuntimeError(f"unknown expression type: {expr} {syserr}")
   
 from lexer import *
 from parser import *

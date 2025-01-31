@@ -17,7 +17,7 @@ class Parser:
         token = self.curr()
         
         if not token:
-            raise ParseError("unexpected end of input\nthis is most likely a problem with sigma. open an issue at https://github.com/dimini171/sigma/issues/new")
+            raise ParseError(f"unexpected end of input {syserr}")
         
         if expected and token.type != expected:
             raise ParseError(f"expected {expected} but {token} is {token.type}")
@@ -62,7 +62,7 @@ class Parser:
             return self.expr()
         
         else:
-            raise ParseError(f"unexpected token {token}\nthis is most likely a problem with sigma. open an issue at https://github.com/dimini171/sigma/issues/new")
+            raise ParseError(f"unexpected token {token} {syserr}")
         
     
     def decl(self):
