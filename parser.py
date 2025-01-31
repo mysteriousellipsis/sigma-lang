@@ -66,7 +66,37 @@ class Parser:
         
     
     def decl(self):
-        pass
+        self.consume("NEW_VAR_IDENT")
+        
+        constvar = self.consume()
+        
+        if constvar.type == "CONST":
+            isconst = True
+
+        elif constvar.type == "VAR":
+            isconst = False
+
+        else:
+            raise ParseError(f"expected {KEYWORDS["CONST"]} or {KEYWORDS["VAR"]} after {KEYWORDS["NEW_VAR_IDENT"]}")
+        
+        vartypetok = self.consume("TYPE")
+        vartype = vartypetok.value
+        
+        idtok = self.consume("ID")
+        varname = idtok.value
+        
+        value = None
+        if self.curr() and self.curr().type == "ASSIGNMENT_OPERATOR":
+            self.consume("ASSIGNMENT_OPERATOR")
+            value = self.expr()
+        
+        return {
+            "type": "declaration",
+            "name": varname,
+            "vartype": vartype,
+            "isconst": isconst,
+            "value": value
+        }
 
     def ifelse(self):
         pass
@@ -84,4 +114,16 @@ class Parser:
         pass
 
     def expr(self):
-        pass
+        token = self.consume()
+        
+        if token.type in {"INT", "FLOAT"}:
+            return {"type": "literal", "type": token.type, "value": token.value}
+        
+        elif token.type == "BOOL":
+            return {"type": "literal", "type": token.value == "true"}
+        
+        elif token.type == "ID":
+            return {"type": "variable", "name": token.value}
+        
+        else:
+            raise ParseError(f"invalid expression token {token.type}")
