@@ -1,7 +1,7 @@
 pip3 install -U PyInstaller
 
-echo "purging ./build/"
-rm -rf build/
+echo "purging ./dist/"
+rm -rf dist/
 
 python -m PyInstaller --onefile --name "sigma-$(arch)" main.py
 
