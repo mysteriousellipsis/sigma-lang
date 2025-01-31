@@ -103,17 +103,40 @@ class Parser:
         pass
 
     def whileloop(self):
-        pass
+        self.consume("WHILE_OPEN")
+        condition = self.parse_expression()
+        self.consume("DO")
+        
+        body = []
+        
+        while self.curr() and self.curr().type != "WHILE_CLOSE":
+            body.append(self.parseline())
+            
+        self.consume ("WHILE_CLOSE")
+        
+        return {
+            "type": "while",
+            "condition": condition,
+            "body": body
+        }
 
     def output(self):
         self.consume("OUTPUT")
         value = self.expr()
-        return {"type": "input", "value": value}
+        
+        return {
+            "type": "input", 
+            "value": value
+        }
 
     def receive(self):
         self.consume("INPUT")
         target = self.consume("ID").value
-        return {"type": "input", "target": target}
+        
+        return {
+            "type": "input", 
+            "target": target
+        }
 
     def reassign(self):
         pass
@@ -122,23 +145,32 @@ class Parser:
         token = self.consume()
         
         if token.type in {"INT", "FLOAT"}:
-            return {"type": "literal", "type": token.type, "value": token.value}
+            return {
+                "type": "literal", 
+                "type": token.type, "value": token.value
+            }
         
         elif token.type == "BOOL":
-            return {"type": "literal", "type": token.value == "true"}
+            return {
+                "type": "literal", 
+                "type": token.value == "true"
+            }
         
         elif token.type == "ID":
-            return {"type": "variable", "name": token.value}
+            return {
+                "type": "variable", 
+                "name": token.value
+            }
         
         else:
             raise ParseError(f"invalid expression token {token.type}")
+
 
 from lexer import *
 
 lexer = Lexer("new var int variablename is 1")
 
 lexed = lexer.tokenize()
-
 parser = Parser(lexed)
 
 print(f"ast: {parser.parse()}")
