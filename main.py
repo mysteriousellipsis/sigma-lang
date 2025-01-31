@@ -19,11 +19,11 @@ def main(filename):
     with open(filename, 'r') as file:
         code = file.read()
         
-    # tokens = tokenize(code)
-    # parser = Parser(tokens)
-    # ast = parser.parse()
-    # evaluator = Evaluator()
-    # evaluator.evaluate(ast)
+    tokens = tokenize(code)
+    parser = Parser(tokens)
+    ast = parser.parse()
+    evaluator = Evaluator()
+    evaluator.evaluate(ast)
 
 args = sys.argv
 

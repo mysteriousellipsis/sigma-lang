@@ -93,7 +93,16 @@ class Evaluator:
             raise RuntimeError(f"input should be {exptype} but wrong type was provided")
         
     def reassign(self, node):
-        print(f"reassign {node}")
+        varname = node['name']
+        
+        if varname in self.constants:
+            raise RuntimeError(f"constant {varname} cannot be changed")
+        
+        if varname not in self.variables:
+            raise RuntimeError(f"undefined variable: {varname}")
+        
+        value = self.evalexpr(node["value"])
+        self.variables[varname][0] = value
         
     def evalexpr(self, expr):
         if expr["type"] == "literal":
