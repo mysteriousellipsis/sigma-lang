@@ -11,6 +11,9 @@ class Evaluator:
             self.evalnode(node)
             
     def evalnode(self, node):
+        if not node:
+            raise RuntimeError(f"node is a nonetype {syserr}")
+            
         type_ = node.get("type")
         
         if type_ == "declaration":
@@ -68,10 +71,18 @@ class Evaluator:
         
     def output(self, node):
         value = self.evalexpr(node["value"])
-        print(value)
+        newline = node["newline"]
+        if newline:
+            print(value)
+        else:
+            print(value, end="")
         
     def receive(self, node):
         target = node["target"]
+        if not target:
+            input()
+            return None
+        
         if target not in self.variables:
             raise RuntimeError(f"undefined variable {target}")
         
@@ -127,17 +138,25 @@ class Evaluator:
                 return self.variables[expr["name"]][0]
             raise RuntimeError(f"undefined variable {expr["name"]}")
         
+        elif expr["type"] == "comparison":
+            left = self.evalexpr(expr["left"])
+            right = self.evalexpr(expr["right"])
+            op = expr["op"]
+
+            if op == "GREATER":
+                return left > right
+            elif op == "LESS":
+                return left < right
+            elif op == "EQUALS":
+                return left == right
+            elif op == "GTE":
+                return left >= right
+            elif op == "LTE":
+                return left <= right
+            elif op == "NOT":
+                return left != right
+            else:
+                raise RuntimeError(f"Unknown comparison operator: {op}")
+        
         else:
             raise RuntimeError(f"unknown expression type: {expr} {syserr}")
-  
-from lexer import *
-from parser import *
-      
-test = "print 'some text'"
-lexer = Lexer(test)
-tokens = lexer.tokenize()
-parser = Parser(tokens)
-ast = parser.parse()
-
-evaluator = Evaluator()
-evaluator.evaluate(ast)

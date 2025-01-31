@@ -1,5 +1,6 @@
 syserr = "\nthis is most likely a problem with sigma. open an issue at https://github.com/dimini171/sigma/issues/new"
 KEYWORDS = {
+    "TO": "to",
     # important ntihngs
     "FILE_IDENT": "!>sigma",
     "FILE_EXT": ".sigma",
@@ -22,7 +23,6 @@ KEYWORDS = {
     "VAR": "var",
     "ASSIGNMENT_OPERATOR": "is",
     "REASSIGNMENT_IDENT": "change",
-    "REASSIGNMENT_OPERATOR": "to",
 
     # math
     "ADD": "add",
@@ -51,7 +51,6 @@ KEYWORDS = {
 
     # i/o
     "INPUT": "receive",
-    "INPUT_TO": "to",
     "OUTPUT": "print",
     "OUTPUT_NEWLINE": "line",
 
@@ -68,7 +67,7 @@ KEYWORDS = {
     "BOOL": "bool",
     "NONETYPE": "none",
     "STRING": "string",
-    "TYPE": {"INTEGER", "FLOAT", "BOOL", "NONETYPE", "STRING"},
+    "TYPE": {"int", "float", "bool", "none", "string"},
     "BOOL_TYPES": ["true", "false"],
     "NONE_TYPES": ["none", "nothing"],
 

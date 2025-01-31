@@ -9,6 +9,7 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.pos = 0
+        self.compops = {"EQUALS", "GTE", "LTE", "GREATER", "LESS", "NOT"}
         
     def curr(self):
         return self.tokens[self.pos] if self.pos < len(self.tokens) else None
@@ -31,6 +32,7 @@ class Parser:
         
         while self.curr():
             ast.append(self.parseline())
+            self.pos += 1
             
         return ast
     
@@ -43,7 +45,7 @@ class Parser:
         if token.type == "NEW_VAR_IDENT":
             return self.decl()
         
-        elif token.type == "IF_OPEN":
+        elif token.type in "IF_OPEN":
             return self.ifelse()
         
         elif token.type == "WHILE_OPEN":
@@ -60,6 +62,9 @@ class Parser:
         
         elif token.type == "ID":
             return self.expr()
+        
+        elif token.type == "COMMENT_OPEN":
+            return None
         
         else:
             raise ParseError(f"unexpected token {token} {syserr}")
@@ -99,40 +104,41 @@ class Parser:
         }
 
     def ifelse(self):
-        self.consume("IF_OPEN")
-        condition = self.expr()
+        body = []
+        elifs = []
+        elsebody = []
+
+        self.consume("IF_OPEN")        
+        condition = self.evalcond()
         self.consume("THEN")
         self.consume("DO")
         
         body = []
         while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
             body.append(self.parseline())
-            
-        elifs = []
-        elsebody = []
         
-        while self.curr() and self.curr().type in {"ELIF", "ELSE"}:
-            if self.curr().type == "ELIF":
-                self.consume("ELIF")
-                elifcond = self.expr()
-                self.consume("THEN")
-                self.consume("DO")
-                elifbody = []
-                while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
-                    elifbody.append(self.parseline())
-                
-                elifs.append((elifcond, elifbody))
+        while self.curr() and self.curr().type in "ELIF":
+            self.consume("ELIF")
+            elifcond = self.evalcond()
+            self.consume("THEN")
+            self.consume("DO")
             
-            if self.curr().type == "ELSE":
-                self.consume("ELSE")
-                self.consume("DO")
-                while self.curr() and self.curr().type != "IF_CLOSE":
-                    elsebody.append(self.parseline())
+            elifbody = []
+            while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
+                elifbody.append(self.parseline())
+            
+            elifs.append((elifcond, elifbody))
+        
+        if self.curr() and self.curr().type == "ELSE":
+            self.consume("ELSE")
+            self.consume("DO")
+            while self.curr() and self.curr().type != "IF_CLOSE":
+                elsebody.append(self.parseline())
         
         try:
             self.consume("IF_CLOSE")
         
-        except:
+        except ParseError:
             print(f"{KEYWORDS['IF_CLOSE']} not found.")
             
         return {
@@ -163,26 +169,43 @@ class Parser:
 
     def output(self):
         self.consume("OUTPUT")
-        value = self.expr()
-        
-        return {
-            "type": "output", 
-            "value": value
-        }
+        try:
+            self.consume("OUTPUT_NEWLINE")
+            value = self.expr()
+            return {
+                "type": "output", 
+                "value": value,
+                "newline": True
+            }
+        except:
+            value = self.expr()
+            return {
+                "type": "output", 
+                "value": value,
+                "newline": False
+            }
 
     def receive(self):
         self.consume("INPUT")
-        target = self.consume("ID").value
+        try:
+            self.consume("TO")
+            target = self.consume("ID").value
+            
+            return {
+                "type": "input", 
+                "target": target
+            }
         
-        return {
-            "type": "input", 
-            "target": target
-        }
+        except:
+            return {
+                "type": "input",
+                "target": None
+            }
 
     def reassign(self):
         self.consume("REASSIGNMENT_IDENT")
         varname = self.consume("ID").value
-        self.consume("REASSIGNMENT_OPERATOR")
+        self.consume("TO")
         value = self.expr()
         
         return {
@@ -199,7 +222,7 @@ class Parser:
         
         if token.type == "LEFT_BRACKET":
             self.consume("LEFT_BRACKET")
-            condition = self.expr()
+            condition = self.evalcond()
             self.consume("RIGHT_BRACKET")
             return condition
         
@@ -234,3 +257,16 @@ class Parser:
         
         else:
             raise ParseError(f"invalid expression token {token.type}")
+    
+    def evalcond(self):
+        node = self.expr()
+        while self.curr() and self.curr().type in self.compops:
+            operator = self.consume()
+            right = self.expr()
+            node = {
+                'type': 'comparison',
+                'op': operator.type,
+                'left': node,
+                'right': right
+            }
+        return node

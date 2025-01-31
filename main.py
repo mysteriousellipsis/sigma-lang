@@ -27,23 +27,21 @@ def validatefile(filename):
 def runfile(filename):
     try:
         with open(filename, 'r') as file:
-            code = file.read()
+            code = file.readlines()
+        
+        for line in code:
+            line = line.strip()
+            lexer = Lexer(line)
+            tokens = lexer.tokenize()
             
-        lexer = Lexer(code)
-        tokens = lexer.tokenize()
-        
-        parser = Parser(tokens)
-        ast = parser.parse()
-        
-        evaluator = Evaluator()
-        evaluator.evaluate(ast)
+            parser = Parser(tokens)
+            ast = parser.parse()
+            
+            evaluator = Evaluator()
+            evaluator.evaluate(ast)
     
     except FileNotFoundError:
         print(f"error: {filename} not found")
-        
-    except Exception as e:
-        print(f"error executing {filename}: {e}")
-        sys.exit()
         
 def main():
     if len(sys.argv) < 2:
@@ -56,6 +54,8 @@ def main():
     for filename in sys.argv[1:]:
         if not validatefile(filename):
             continue
+        
+        runfile(filename)
         
         try:
             runfile(filename)

@@ -21,6 +21,7 @@ escapedkw = [re.escape(kw) for kw in keywords]
 kwpattern = '|'.join(escapedkw)\
 
 pattern = fr'''
+            (<--[\s\S]*?-->)|
             ("[^"]*"|'[^']*')|
             ({kwpattern})|
             ([()])|
@@ -67,6 +68,10 @@ class Lexer:
         while self.currword is not None:
             word = self.currword
             
+            if word.startswith('<--') and word.endswith('-->'):
+                self.next()
+                continue
+            
             if word.startswith('"') and word.endswith('"') or word.startswith("'") and word.endswith("'"):
                 tokens.append(Token('STRING', word[1:-1]))
                 self.next()
@@ -81,9 +86,9 @@ class Lexer:
                 tokens.append(Token('RIGHT_BRACKET'))
                 self.next()
                 continue
-                
-            if word in keywordsinv:
-                tokens.append(Token(keywordsinv[word]))
+            
+            if word in KEYWORDS["TYPE"]:
+                tokens.append(Token("TYPE", word))
                 self.next()
                 continue
             
@@ -98,6 +103,11 @@ class Lexer:
                 
             elif self.isfloat(word):
                 tokens.append(Token("FLOAT", word))
+                
+            elif word in keywordsinv:
+                tokens.append(Token(keywordsinv[word]))
+                self.next()
+                continue
             
             else:
                 tokens.append(Token("ID", word))
