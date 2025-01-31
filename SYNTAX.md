@@ -40,9 +40,9 @@ variables are stored as a dictionary (globals.py > variables)
 
 ## assigning
 ```bash
-new variable <type> <name> is <expression>
-new constant <type> <name> is <expression>
-new variable <type> <name> 
+new var <type> <name> is <expression>
+new const <type> <name> is <expression>
+new var <type> <name> 
 ```
 
 variable is interchangable with var

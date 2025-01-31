@@ -1,3 +1,4 @@
+syserr = "\nthis is most likely a problem with sigma. open an issue at https://github.com/dimini171/sigma/issues/new"
 KEYWORDS = {
     # important ntihngs
     "FILE_IDENT": "!>sigma",

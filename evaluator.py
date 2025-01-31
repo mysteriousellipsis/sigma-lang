@@ -3,117 +3,141 @@ from globals import *
 
 class Evaluator:
     def __init__(self):
-        pass
+        self.variables = variables
+        self.constants = constants
 
     def evaluate(self, ast):
         for node in ast:
             self.evalnode(node)
-
+            
     def evalnode(self, node):
-        '''
-        parses the nodes n stuff
-        '''
-        if node[0] == "DECLARE":
+        type_ = node.get("type")
+        
+        if type_ == "declaration":
             self.decl(node)
-
-        elif node[0] == "IF":
+            
+        elif type_ == "if":
             self.ifelse(node)
-        
-        elif node[0] == "WHILE":
+            
+        elif type_ == "while":
             self.whileloop(node)
-
-        elif node[0] == "PRINT":
+            
+        elif type_ == "output":
             self.output(node)
-
-        elif node[0] == "RECEIVE":
+            
+        elif type_ == "input":
             self.receive(node)
-
-        elif node[0] == "ASSIGN":
-            self.assign(node)
-
+            
+        elif type_ == "reassignment":
+            self.reassign(node)
+        
         else:
-            raise RuntimeError(f"unknown node type: {node[0]}\n this is most likely a problem with sigma. please open an issue at https://github.com/dimini171/sigma/issues")
+            raise RuntimeError(f"unknown node type {type_} {syserr}")
         
-    def evalcond(self, condition):
-        '''
-        evaluates conditions
-        '''
-        # TODO: make this actually work???
-        return eval(condition)
-    
     def decl(self, node):
-        _, varname, vartype, value, isconst = node
+        varname = node["name"]
+        vartype = node["vartype"]
+        isconst = node["isconst"]
+        value = node["value"]
         
-        # TODO: add type checking
-
-        if varname in constants:
-            raise RuntimeError(f"constant {varname} cannot be changed")
+        if varname in self.constants:
+            raise RuntimeError(f"constant {varname} cannot be reassigned")
         
         if value is not None:
-            variables[varname] = [value, vartype]
-            
+            evaledval = self.evalexpr(value)
+            self.variables[varname] = [evaledval, vartype]
             if isconst:
-                constants[varname] = vartype
-    
+                self.constants[varname] = vartype
+        
     def ifelse(self, node):
-        _, condition, body, elifs, elsebod = node
-
-        if self.evalcond(condition):
-            self.evaluate(body)
+        condition = self.evalexpr(node["condition"])
+        if condition:
+            self.evaluate(node["body"])
             return
         
-        for elifcond, elifbod in elifs:
-            if self.evalcond(elifcond):
-                self.evaluate(elifbod)
+        for elifcond, elifbody in node["elifs"]:
+            if self.evalexpr(elifcond):
+                self.evaluate(elifbody)
                 return
             
-        self.evaluate(elsebod)
-    
+        self.evaluate(node["elsebody"])
+        
     def whileloop(self, node):
-        _, condition, body = node
-
-        while self.evalexpr(condition):
-            self.evaluate(body)
-            
+        while self.evalexpr(node["condition"]):
+            self.evaluate(node["body"])
+        
     def output(self, node):
-        _, value = node
-
+        value = self.evalexpr(node["value"])
         print(value)
         
     def receive(self, node):
-        _, varname = node
+        target = node["target"]
+        if target not in self.variables:
+            raise RuntimeError(f"undefined variable {target}")
+        
         usrinp = input()
-        try:
-            variables[varname][0] = [usrinp]
-        except:
-            print(f"variable {varname} does not exist")
-            
-    def assign(self, node):
-        _, name, value = node
-
-        if name in constants:
-            raise RuntimeError(f"constant {name} cannot be changed")
+        
+        exptype = self.variables[target][1]
         
         try:
-            variables[name][0] = value
-        except:
-            print(f"variable {name} does not exist. ")
-            
+            if exptype == "int":
+                self.variables[target][0] = int(usrinp)
+                
+            elif exptype == "float":
+                self.variables[target][0] = float(usrinp)
+                
+            else:
+                self.variables[target][0] = usrinp
+
+        except ValueError:
+            raise RuntimeError(f"input should be {exptype} but wrong type was provided")
+        
+    def reassign(self, node):
+        varname = node['name']
+        
+        if varname in self.constants:
+            raise RuntimeError(f"constant {varname} cannot be changed")
+        
+        if varname not in self.variables:
+            raise RuntimeError(f"undefined variable: {varname}")
+        
+        value = self.evalexpr(node["value"])
+        self.variables[varname][0] = value
+        
     def evalexpr(self, expr):
-        if expr[0] == "INTEGER":
-            return int(expr[1])
-        
-        elif expr[0] == "FLOAT":
-            return float(expr[1])
-        
-        elif expr[0] == "STRING":
-            return str(expr[1])
-        
-        elif expr[0] == "VARIABLE":
-            if expr[1] not in variables:
-                raise RuntimeError(f"variable {expr[1]} is undefined")
+        if expr["type"] == "literal":
+            if expr["valtype"] == "string":
+                return expr["value"]
             
-            return variables[expr[1]]
+            try:
+                if expr["valtype"] == "INT":
+                    return int(expr["value"])
+                
+                elif expr["valtype"] == "FLOAT":
+                    return float(expr["value"])
+                
+                else:
+                    return expr["value"]
+            
+            except:
+                return expr["value"]
 
+        elif expr["type"] == "variable":
+            if expr["name"] in self.variables:
+                return self.variables[expr["name"]][0]
+            raise RuntimeError(f"undefined variable {expr["name"]}")
+        
         else:
-            raise RuntimeError(f"unknown expression type: {expr[0]}\n this is most likely a problem with sigma. please open an issue at https://github.com/dimini171/sigma/issues")
+            raise RuntimeError(f"unknown expression type: {expr} {syserr}")
+  
+from lexer import *
+from parser import *
+      
+test = "print 'some text'"
+lexer = Lexer(test)
+tokens = lexer.tokenize()
+parser = Parser(tokens)
+ast = parser.parse()
+
+evaluator = Evaluator()
+evaluator.evaluate(ast)

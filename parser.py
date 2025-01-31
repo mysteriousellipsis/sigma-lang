@@ -4,148 +4,233 @@ class ParseError(Exception):
     def __init__(self, message = ""):
         super().__init__(message)
         
+        
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.pos = 0
         
     def curr(self):
-        '''
-        returns the current token without consumitng
-        '''
         return self.tokens[self.pos] if self.pos < len(self.tokens) else None
     
     def consume(self, expected=None):
         token = self.curr()
-        if not token:
-            raise ParseError("unexpected eol")
         
-        if expected and token[0] != expected:
-            raise ParseError(f"expected {expected} but got {token[0]} instead")
-            
+        if not token:
+            raise ParseError(f"unexpected end of input {syserr}")
+        
+        if expected and token.type != expected:
+            raise ParseError(f"expected {expected} but {token} is {token.type}")
+        
         self.pos += 1
+        
         return token
     
     def parse(self):
         ast = []
+        
         while self.curr():
             ast.append(self.parseline())
+            
         return ast
-
+    
     def parseline(self):
         token = self.curr()
-        if token:
-            if token[0] == NEW_VAR_IDENT.upper():
-                return self.declaration()
-            
-            elif token[0] == IF_OPEN.upper():
-                return self.ifelse()
-            
-            elif token[0] == WHILE_OPEN.upper():
-                return self.whileloop()
-            
-            elif token[0] == OUTPUT.upper():
-                return self.output()
-            
-            elif token[0] == INPUT.upper():
-                return self.input()
-            
-            elif token[0] == 'ID':
-                return self.assignment()
-            
-            else:
-                raise ParseError(f"unexpected token: {token[0]}")
         
-    def declaration(self):
-        self.consume(NEW_VAR_IDENT.upper())
-        isconst = False
-            
-        vartype = self.consume("ID")[1]
-        varname = self.consume("ID")[1]
+        if not token:
+            return None
+        
+        if token.type == "NEW_VAR_IDENT":
+            return self.decl()
+        
+        elif token.type == "IF_OPEN":
+            return self.ifelse()
+        
+        elif token.type == "WHILE_OPEN":
+            return self.whileloop()
+        
+        elif token.type == "OUTPUT":
+            return self.output()
+        
+        elif token.type == "INPUT":
+            return self.receive()
+        
+        elif token.type == "REASSIGNMENT_IDENT":
+            return self.reassign()
+        
+        elif token.type == "ID":
+            return self.expr()
+        
+        else:
+            raise ParseError(f"unexpected token {token} {syserr}")
+        
+    
+    def decl(self):
+        self.consume("NEW_VAR_IDENT")
+        
+        constvar = self.consume()
+        
+        if constvar.type == "CONST":
+            isconst = True
+
+        elif constvar.type == "VAR":
+            isconst = False
+
+        else:
+            raise ParseError(f"expected {KEYWORDS["CONST"]} or {KEYWORDS["VAR"]} after {KEYWORDS["NEW_VAR_IDENT"]}")
+        
+        vartypetok = self.consume("TYPE")
+        vartype = vartypetok.value
+        
+        idtok = self.consume("ID")
+        varname = idtok.value
         
         value = None
-
-        if self.curr() and self.curr()[1] == ASSIGNMENT_OPERATOR:
-            self.consume()
+        if self.curr() and self.curr().type == "ASSIGNMENT_OPERATOR":
+            self.consume("ASSIGNMENT_OPERATOR")
             value = self.expr()
-            
-        return ("DECLARE", varname, vartype, value, isconst)
+        
+        return {
+            "type": "declaration",
+            "name": varname,
+            "vartype": vartype,
+            "isconst": isconst,
+            "value": value
+        }
 
     def ifelse(self):
-        self.consume(IF_OPEN.upper())
+        self.consume("IF_OPEN")
         condition = self.expr()
-        self.consume(THEN.upper())
-        self.consume(DO.upper())
-    
-        body = []
+        self.consume("THEN")
+        self.consume("DO")
         
-        while self.curr() and self.curr()[0] not in (ELIF.upper(), ELSE.upper(), IF_CLOSE.upper()):
+        body = []
+        while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
             body.append(self.parseline())
             
         elifs = []
-        elsebod = []
+        elsebody = []
         
-        while self.curr() and self.curr()[0] in (ELIF.upper(), ELSE.upper()):
-            if self.curr()[0] == ELIF.upper():
-                self.consume()
+        while self.curr() and self.curr().type in {"ELIF", "ELSE"}:
+            if self.curr().type == "ELIF":
+                self.consume("ELIF")
                 elifcond = self.expr()
-                self.consume(THEN.upper())
-                self.consume(DO.upper())
-                elifbod = []
-                while self.curr() and self.curr()[0] not in (ELIF.upper(), ELSE.upper(), IF_CLOSE.upper()):
-                    elifbod.append(self.parseline())
-                elifs.append((elifcond, elifbod))
-            else:
-                self.consume(ELSE.upper())
-                self.consume(DO.upper())
-                while self.curr() and self.curr()[0] != IF_CLOSE.upper():
-                    elsebod.append(self.parseline())
+                self.consume("THEN")
+                self.consume("DO")
+                elifbody = []
+                while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
+                    elifbody.append(self.parseline())
+                
+                elifs.append((elifcond, elifbody))
+            
+            if self.curr().type == "ELSE":
+                self.consume("ELSE")
+                self.consume("DO")
+                while self.curr() and self.curr().type != "IF_CLOSE":
+                    elsebody.append(self.parseline())
         
-        self.consume(IF_CLOSE.upper())
-        return ("IF", condition, body, elifs, elsebod)
+        try:
+            self.consume("IF_CLOSE")
+        
+        except:
+            print(f"{KEYWORDS['IF_CLOSE']} not found.")
+            
+        return {
+            "type": "if",
+            "condition": condition,
+            "body": body,
+            "elifs": elifs,
+            "elsebody": elsebody
+        }
 
     def whileloop(self):
-        self.consume(WHILE_OPEN.upper())
+        self.consume("WHILE_OPEN")
         condition = self.expr()
-        self.consume(DO.upper())
+        self.consume("DO")
+        
         body = []
         
-        while self.curr() and self.curr()[0] != WHILE_CLOSE.upper():
+        while self.curr() and self.curr().type != "WHILE_CLOSE":
             body.append(self.parseline())
+            
+        self.consume ("WHILE_CLOSE")
         
-        self.consume(WHILE_CLOSE.upper())
-        
-        return ("WHILE", condition, body)
-        
+        return {
+            "type": "while",
+            "condition": condition,
+            "body": body
+        }
+
     def output(self):
-        self.consume(OUTPUT.upper())
+        self.consume("OUTPUT")
         value = self.expr()
-        return ("PRINT", value)
         
-    def input(self):
-        self.consume(INPUT.upper())
-        varname = self.consume("ID")[1]
-        return ("RECEIVE", varname)
+        return {
+            "type": "output", 
+            "value": value
+        }
+
+    def receive(self):
+        self.consume("INPUT")
+        target = self.consume("ID").value
         
-    def assignment(self):
-        varname = self.consume("ID")[1]
-        self.consume(REASSIGNMENT_OPERATOR.upper())
+        return {
+            "type": "input", 
+            "target": target
+        }
+
+    def reassign(self):
+        self.consume("REASSIGNMENT_IDENT")
+        varname = self.consume("ID").value
+        self.consume("REASSIGNMENT_OPERATOR")
         value = self.expr()
-        return ("ASSIGN", varname, value)
-    
+        
+        return {
+            "type": "reassignment",
+            "name": varname,
+            "value": value
+        }
+
     def expr(self):
-        token = self.consume()
-        if token[0] == "INTEGER":
-            return ("INTEGER", token[1])
-            
-        elif token[0] == "FLOAT":
-            return ("FLOAT", token[1])
+        token = self.curr()
         
-        elif token[0] == "STRING":
-            return ("STRING", token[1])
+        if not token:
+            raise ParseError(f"unexpected eol")
+        
+        if token.type == "LEFT_BRACKET":
+            self.consume("LEFT_BRACKET")
+            condition = self.expr()
+            self.consume("RIGHT_BRACKET")
+            return condition
+        
+        token = self.consume()
+        
+        if token.type in {"INT", "FLOAT"}:
+            return {
+                "type": "literal", 
+                "valtype": token.type, 
+                "value": token.value
+            }
+        
+        elif token.type == "BOOL":
+            return {
+                "type": "literal", 
+                "valtype": "bool",
+                "value": token.value == "true"
+            }
             
-        elif token[0] == "ID":
-            return ("VARIABLE", token[1])
+        elif token.type == "STRING":
+            return {
+                "type": "literal",
+                "valtype": "string",
+                "value": token.value
+            }
+        
+        elif token.type == "ID":
+            return {
+                "type": "variable", 
+                "name": token.value
+            }
         
         else:
-            raise ParseError(f"invalid expression {token}")
+            raise ParseError(f"invalid expression token {token.type}")
