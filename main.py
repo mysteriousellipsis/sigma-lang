@@ -2,6 +2,7 @@ import sys
 from lexer import *
 from parser import *
 from evaluator import *
+from globals import *
 
 def validatefile(filename):
     try:
@@ -52,8 +53,6 @@ def main():
     for filename in sys.argv[1:]:
         if not validatefile(filename):
             continue
-        
-        runfile(filename)
         
         try:
             runfile(filename)

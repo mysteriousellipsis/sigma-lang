@@ -5,6 +5,7 @@ rewrite of the [original](https://github.com/dimini171/sigma/tree/v1), now more 
 
 ## known issues
 inline math does not work (e.g. `change count to count minus 1`)
+nested logic does not work (e.g. `((1 is equal to 2) or (2 is equal to 2))`)
 
 ## what is this??
 sigma lang was made for our final year computing coursework.   

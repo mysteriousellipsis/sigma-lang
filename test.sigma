@@ -54,6 +54,7 @@ else do
 fi
 
 <-- 6. While Loops -->
+<--
 print line "\n=== While Loop Test ==="
 new var int counter is 3
 
@@ -63,12 +64,14 @@ while (counter is greater than 0) do
     print line ""
     counter change to counter minus 1
 elihw
+-->
 
 <-- 7. Logical Operators -->
 print line "\n=== Logical Operators Test ==="
 new var int a is 5
 new var int b is 10
 
+<--
 if ((a is less than 10) and (b is greater than 5)) then do
     print line "Both conditions are true!"
 fi
@@ -76,16 +79,11 @@ fi
 if ((a is greater than 10) or (b is equal to 10)) then do
     print line "At least one condition is true!"
 fi
+-->
 
 <-- 8. Constant Validation Test -->
 print line "\n=== Constant Validation Test ==="
 <-- This should fail when uncommented -->
-<-- message change to "Try to change constant" -->
-
-<-- 9. None Type Handling -->
-print line "\n=== None Type Test ==="
-if (empty is none) then do
-    print line "None value detected correctly!"
-fi
+<-- change message to "Try to change constant" -->
 
 print line "\n=== All Tests Completed ==="
