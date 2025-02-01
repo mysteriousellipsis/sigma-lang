@@ -44,7 +44,7 @@ class Lexer:
     def __init__(self, text):
         self.text = text
         self.pos = 0
-        self.words = re.findall(pattern, text, re.VERBOSE)
+        self.words = re.findall(pattern, text, re.VERBOSE | re.DOTALL)
         self.words = [next(group for group in match if group) for match in self.words]
         self.currword = self.words[self.pos] if self.pos < len(self.words) else None
 

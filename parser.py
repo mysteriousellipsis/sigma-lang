@@ -44,7 +44,7 @@ class Parser:
         if token.type == "NEW_VAR_IDENT":
             return self.decl()
         
-        elif token.type in "IF_OPEN":
+        elif token.type == "IF_OPEN":
             return self.ifelse()
         
         elif token.type == "WHILE_OPEN":
@@ -104,7 +104,6 @@ class Parser:
         }
 
     def ifelse(self):
-        print(self.tokens)
         self.consume("IF_OPEN")        
         condition = self.evalcond()
         self.consume("THEN")
@@ -112,15 +111,12 @@ class Parser:
         
         body = []
         while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
-            print(self.tokens)
             body.append(self.parseline())
             
         elifs = []
         elsebody = []
-        
-        print(self.tokens)
+       
         while self.curr() and self.curr().type == "ELIF":
-            print("elif detected")
             self.consume("ELIF")
             elifcond = self.evalcond()
             self.consume("THEN")
@@ -139,10 +135,7 @@ class Parser:
             while self.curr() and self.curr().type != "IF_CLOSE":
                 elsebody.append(self.parseline())
         
-        try:
-            self.consume("IF_CLOSE")
-        except ParseError:
-            print(f"{KEYWORDS['IF_CLOSE']} not found.")
+        self.consume("IF_CLOSE")
             
         return {
             "type": "if",

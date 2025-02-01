@@ -4,7 +4,7 @@ rewrite of the [original](https://github.com/dimini171/sigma/tree/v1), now more 
 **this version of sigma is undergoing testing. a stable version can be found [here](https://github.com/dimini171/sigma/tree/v1)**
 
 ## known issues
-if else statements dont work due to some problems with how the code is interpreted
+inline math does not work (e.g. `change count to count minus 1`)
 
 ## what is this??
 sigma lang was made for our final year computing coursework.   
