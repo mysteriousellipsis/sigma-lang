@@ -11,10 +11,9 @@ class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.pos = 0
-        self.compops = {"EQUALS", "GTE", "LTE", "GREATER", "LESS", "NOT"}
         self.operatorpriority = {
-                    "MULTIPLIED_BY": 3, "DIVIDED_BY": 3,
-                    "PLUS": 2, "MINUS": 2,
+                    "MULTIPLY": 3, "DIVIDE": 3,
+                    "ADD": 2, "MINUS": 2,
                     "EQUALS": 1, "GREATER": 1, "LESS": 1
                 }
 
@@ -220,7 +219,7 @@ class Parser:
         left = self.exprhelper()
 
         # TODO
-        while self.curr() and self.priority(self.curr().type) > priority:
+        while self.curr() and self.curr().type not in {"RIGHT_BRACKET", "NEWLINE"} and self.priority(self.curr().type) > priority:
             operator = self.consume()
             right = self.expr(self.priority(operator.type))
             left = {
@@ -233,6 +232,7 @@ class Parser:
         return left
 
     def exprhelper(self):
+        # TODO: fix this
         '''
         helper function for expr()
         basically just a bunch of if else statements
@@ -244,7 +244,9 @@ class Parser:
             self.consume("RIGHT_BRACKET")
             return expr
 
-        token = self.consume()
+        if token.type in self.operatorpriority.keys():
+            expr = self.expr()
+            return expr
 
         if token.type in {"INT", "FLOAT"}:
             return {
@@ -252,21 +254,18 @@ class Parser:
                 "valtype": token.type,
                 "value": token.value
             }
-
         elif token.type == "BOOL":
             return {
                 "type": "literal",
                 "valtype": "bool",
                 "value": token.value == "true"
             }
-
         elif token.type == "STRING":
             return {
                 "type": "literal",
                 "valtype": "string",
                 "value": token.value
             }
-
         elif token.type == "ID":
             return {
                 "type": "variable",
@@ -312,8 +311,8 @@ if __name__ == '__main__':
                     code = open(file, 'r').read()
             elif flag == "--default":
                 code = '''
-new int variablename is ((5 multiplied by 4) plus (1 plus 3))
-print variablename
+new int var iablename is ((5 multiplied by 4) plus (1 plus 3))
+print iablename
 print"variablename"
 '''
             print(f"code: \n{code}")
