@@ -25,7 +25,7 @@ KEYWORDS = {
     "REASSIGNMENT_IDENT": "change",
 
     # math
-    "ADD": "add",
+    "ADD": "plus",
     "SUBTRACT": "minus",
     "DIVIDE": "divided by",
     "MULTIPLY": "multiplied by",

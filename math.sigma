@@ -1,0 +1,5 @@
+new int var a is ((5 plus 5) multiplied by (4 plus 5))
+
+print line a
+print line a
+print line a

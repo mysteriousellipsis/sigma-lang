@@ -1,12 +1,12 @@
 <-- Sigma Language Feature Test File -->
 
 <-- 1. Variable Declarations -->
-new var int count is 5
-new const string message is "Hello Sigma!"
-new var float pi is 3.14159
-new var bool flag is true
-new var string name is ""
-new var int age is 0
+new int var count is 5
+new string const message is "Hello Sigma!"
+new float var pi is 3.14159
+new bool var flag is true
+new string var name is ""
+new int var age is 0
 
 <-- 2. Output Statements -->
 print "=== Basic Output Test ==="
@@ -23,7 +23,7 @@ print line flag
 print line "\n=== Input Test ==="
 print "Enter your name: "
 receive to name
-print "Enter your age (number): " 
+print "Enter your age (number): "
 receive to age
 
 print line ""

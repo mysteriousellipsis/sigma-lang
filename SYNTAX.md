@@ -40,18 +40,14 @@ variables are stored as a dictionary (globals.py > variables)
 
 ## assigning
 ```bash
-new var <type> <name> is <expression>
-new const <type> <name> is <expression>
-new var <type> <name> 
+new <type> var <name> is <expression>
+new <type> const <name> is <expression>
+new <type> var <name> 
 ```
-
-variable is interchangable with var
-constant is interchangable with constant
-
 
 ## reassigning 
 ```bash
-<name> change to <value>
+change <name> to <value>
 ```
 
 ## examples
@@ -92,15 +88,6 @@ comments are surrounded by `<--` and `-->`
 while (<condition>) do
     expression
 elihw
-```
-
-## for 
-(not used currently as iterables do not exist)
-
-```bash
-for (<variable> in <iterable>) do
-    expression
-rof
 ```
 
 ## examples
@@ -192,4 +179,3 @@ print "input username: "
 receive to username
 print "welcome, ${username}"
 ```
-
