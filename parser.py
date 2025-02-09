@@ -50,29 +50,24 @@ class Parser:
 
         if token.type == "NEW_VAR_IDENT":
             return self.decl()
-
         elif token.type == "IF_OPEN":
             return self.ifelse()
-
         elif token.type == "WHILE_OPEN":
             return self.whileloop()
-
         elif token.type == "OUTPUT":
             return self.output()
-
         elif token.type == "INPUT":
             return self.receive()
-
         elif token.type == "REASSIGNMENT_IDENT":
             return self.reassign()
-
         elif token.type == "ID":
             return self.expr()
-
         elif token.type == "COMMENT_OPEN":
             self.consume("COMMENT_OPEN")
             return None
-
+        elif token.type == "NEWLINE":
+            self.consume("NEWLINE")
+            return None
         else:
             raise ParseError(f"unexpected token {token} {syserr}")
 
@@ -217,17 +212,30 @@ class Parser:
             "value": value
         }
 
-    def expr(self):
+    def expr(self, priority=0):
         '''
         parses conditionals and math
+        ai helped a lot with this sob
         '''
         left = self.exprhelper()
 
         # TODO
+        while self.curr() and self.priority(self.curr().type) > priority:
+            operator = self.consume()
+            right = self.expr(self.priority(operator.type))
+            left = {
+                'type': 'operation',
+                'op': operator.type,
+                'left': left,
+                'right': right
+            }
+
+        return left
 
     def exprhelper(self):
         '''
         helper function for expr()
+        basically just a bunch of if else statements
         '''
         token = self.consume()
 
@@ -265,8 +273,7 @@ class Parser:
                 "name": token.value
             }
 
-        else:
-            raise ParseError(f"invalid expression token {token.type}")
+        raise ParseError(f"invalid expression token {token.type}")
 
     def evalcond(self):
         # TODO: fix this
@@ -281,6 +288,12 @@ class Parser:
                 'right': right
             }
         return node
+
+    def priority(self, toktype):
+        '''
+        returns operator priority
+        '''
+        return self.operatorpriority.get(toktype, 0)
 
 # for easier debugging
 if __name__ == '__main__':
@@ -297,7 +310,7 @@ if __name__ == '__main__':
             if flag == "--debug":
                 for file in args:
                     code = open(file, 'r').read()
-            elif flag == "--default-debug":
+            elif flag == "--default":
                 code = '''
 new int variablename is ((5 multiplied by 4) plus (1 plus 3))
 print variablename

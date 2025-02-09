@@ -74,6 +74,8 @@ class Lexer:
 
             if word == '\n':
                 tokens.append(Token('NEWLINE'))
+                self.next()
+                continue
 
             if word.startswith('<--') and word.endswith('-->'):
                 self.next()

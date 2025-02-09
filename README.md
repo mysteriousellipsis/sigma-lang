@@ -4,6 +4,7 @@ rewrite of the [original](https://github.com/dimini171/sigma/tree/v1), now more 
 **this version of sigma is undergoing testing. a stable version can be found [here](https://github.com/dimini171/sigma/tree/v1)**  
 
 ## known issues
+variables cannot contain keywords, even if the word is completely different
 inline math does not work (e.g. `change count to count minus 1`)  
 nested logic does not work (e.g. `((1 is equal to 2) or (2 is equal to 2))`)  
 
@@ -27,6 +28,7 @@ output
 ### completed, not tested
 
 ### in progress
+variable name fix  
 inline math  
 nested logic  
 
