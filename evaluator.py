@@ -131,25 +131,28 @@ class Evaluator:
             if expr["name"] in self.variables:
                 return self.variables[expr["name"]][0]
             raise RuntimeError(f"undefined variable {expr["name"]}")
-        elif expr["type"] == "comparison":
+        elif expr["type"] in ["comparison", "operation"]:
             left = self.evalexpr(expr["left"])
             right = self.evalexpr(expr["right"])
             op = expr["op"]
 
-            if op == "GREATER":
-                return left > right
-            elif op == "LESS":
-                return left < right
-            elif op == "EQUALS":
-                return left == right
-            elif op == "GTE":
-                return left >= right
-            elif op == "LTE":
-                return left <= right
-            elif op == "NOT":
-                return left != right
-            else:
-                raise RuntimeError(f"Unknown comparison operator: {op}")
+            print(op == "EQUALS")
+
+            match op:
+                case "GREATER":
+                    return left > right
+                case "LESS":
+                    return left < right
+                case "EQUALS":
+                    return left == right
+                case "GTE":
+                    return left >= right
+                case "LTE":
+                    return left <= right
+                case "NOT":
+                    return left != right
+                case _:
+                    raise RuntimeError(f"Unknown comparison operator: {op}")
         elif expr["type"] == "operation":
             # TODO: math
             op = expr["op"]
@@ -195,12 +198,13 @@ print"variablename"
             lexer = Lexer(code)
             tokens = lexer.tokenize()
 
-            print(f"tokens: {tokens}")
+            print(f"tokens: {tokens}\n\n")
 
             parser = Parser(tokens)
             ast = parser.parse()
 
-            print(f"ast: {ast}")
+            print(f"ast: {ast}\n\n")
 
+            print(f"output: ")
             evaluator = Evaluator()
             evaluator.evaluate(ast)

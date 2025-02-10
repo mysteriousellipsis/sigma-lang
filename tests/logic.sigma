@@ -1,0 +1,7 @@
+new bool var a is true
+
+if (a is equal to true) then do
+    print line "sigma sigma boy"
+else do
+    print line "not sigma"
+fi

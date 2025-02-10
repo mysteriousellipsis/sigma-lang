@@ -130,7 +130,6 @@ class Parser:
             elifs.append((elifcond, elifbody))
 
         if self.curr() and self.curr().type == "ELSE":
-            print("else detected")
             self.consume("ELSE")
             self.consume("DO")
             while self.curr() and self.curr().type != "IF_CLOSE":
@@ -228,7 +227,6 @@ class Parser:
                 'left': left,
                 'right': right
             }
-
         return left
 
     def exprhelper(self):
@@ -277,7 +275,7 @@ class Parser:
     def evalcond(self):
         # TODO: fix this
         node = self.expr()
-        while self.curr() and self.curr().type not in ['RIGHT_BRACKET', 'NEWLINE']:
+        while self.curr() and self.curr().type not in ['RIGHT_BRACKET', 'NEWLINE', 'THEN']:
             operator = self.consume()
             right = self.expr()
             node = {
@@ -315,11 +313,11 @@ new int var iablename is ((5 multiplied by 4) plus (1 plus 3))
 print iablename
 print"variablename"
 '''
-            print(f"code: \n{code}")
+            print(f"code: \n{code}\n\n")
             lexer = Lexer(code)
             tokens = lexer.tokenize()
 
-            print(f"tokens: {tokens}")
+            print(f"tokens: {tokens}\n\n")
 
             parser = Parser(tokens)
             ast = parser.parse()

@@ -1,4 +1,4 @@
-<-- Sigma Language Feature Test File -->
+<-- Sigma Language General Feature Tests -->
 
 <-- 1. Variable Declarations -->
 new int var count is 5

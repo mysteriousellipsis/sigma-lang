@@ -1,5 +1,10 @@
 new int var a is ((5 plus 5) multiplied by (4 plus 5))
 
+print "a with nested math: "
 print line a
-print line a
+
+change a to 1
+change a to a plus 1
+
+print "a after inline math: "
 print line a
