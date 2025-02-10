@@ -113,54 +113,49 @@ class Evaluator:
         self.variables[varname][0] = value
 
     def evalexpr(self, expr):
-        if expr["type"] == "literal":
-            if expr["valtype"] == "string":
-                return expr["value"]
-
-            try:
-                match expr['valtype']:
+        match expr["type"]:
+            case "literal":
+                match expr["valtype"]:
                     case "INT":
                         return int(expr["value"])
                     case "FLOAT":
-                        return float(expr["value"])
+                        return int(expr["value"])
                     case _:
                         return expr["value"]
-            except:
-                return expr["value"]
-        elif expr["type"] == "variable":
-            if expr["name"] in self.variables:
-                return self.variables[expr["name"]][0]
-            raise RuntimeError(f"undefined variable {expr["name"]}")
-        elif expr["type"] in ["comparison", "operation"]:
-            left = self.evalexpr(expr["left"])
-            right = self.evalexpr(expr["right"])
-            op = expr["op"]
+            case "variable":
+                if expr["name"] in self.variables:
+                    return self.variables[expr["name"]][0]
+                raise RuntimeError(f"undefined variable {expr["name"]}")
+            case "comparison" | "operation":
+                left = self.evalexpr(expr["left"])
+                right = self.evalexpr(expr["right"])
+                op = expr["op"]
 
-            match op:
-                case "GREATER":
-                    return left > right
-                case "LESS":
-                    return left < right
-                case "EQUALS":
-                    return left == right
-                case "GTE":
-                    return left >= right
-                case "LTE":
-                    return left <= right
-                case "NOT":
-                    return left != right
-                case "ADD":
-                    return left + right
-                case "MULTIPLY":
-                    return left * right
-                case "SUBTRACT":
-                    return left * right
-                case "DIVIDE":
-                    return left / right
-                case _:
-                    raise RuntimeError(f"unknown comparison operator: {op}")
-        else:
-            raise RuntimeError(f"unknown expression type: {expr} {syserr}")
+                match op:
+                    case "GREATER":
+                        return left > right
+                    case "LESS":
+                        return left < right
+                    case "EQUALS":
+                        return left == right
+                    case "GTE":
+                        return left >= right
+                    case "LTE":
+                        return left <= right
+                    case "NOT":
+                        return left != right
+                    case "ADD":
+                        return left + right
+                    case "MULTIPLY":
+                        return left * right
+                    case "SUBTRACT":
+                        return left * right
+                    case "DIVIDE":
+                        return left / right
+                    case _:
+                        raise RuntimeError(f"unknown comparison operator: {op}")
+            case _:
+                raise RuntimeError(f"unknown expression type: {expr} {syserr}")
 
 # for easier debugging
 if __name__ == '__main__':

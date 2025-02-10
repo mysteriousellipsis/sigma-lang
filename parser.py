@@ -198,7 +198,6 @@ class Parser:
                     "newline": False
                 }
 
-
     def receive(self):
         self.consume("INPUT")
         match self.curr().type:
@@ -233,7 +232,6 @@ class Parser:
         ai helped a lot with this sob
         '''
         left = self.exprhelper()
-
         # TODO
         while self.curr() and self.curr().type not in {"RIGHT_BRACKET", "NEWLINE"} and self.priority(self.curr().type) > priority:
             operator = self.consume()
@@ -254,38 +252,39 @@ class Parser:
         '''
         token = self.consume()
 
-        if token.type == "LEFT_BRACKET":
-            expr = self.expr()
-            self.consume("RIGHT_BRACKET")
-            return expr
-        elif token.type in self.operatorpriority.keys():
-            expr = self.expr()
-            return expr
-        elif token.type in {"INT", "FLOAT"}:
-            return {
-                "type": "literal",
-                "valtype": token.type,
-                "value": token.value
-            }
-        elif token.type == "BOOL":
-            return {
-                "type": "literal",
-                "valtype": "bool",
-                "value": token.value == "true"
-            }
-        elif token.type == "STRING":
-            return {
-                "type": "literal",
-                "valtype": "string",
-                "value": token.value
-            }
-        elif token.type == "ID":
-            return {
-                "type": "variable",
-                "name": token.value
-            }
-
-        raise ParseError(f"invalid expression token {token.type}")
+        match token.type:
+            case  "LEFT_BRACKET":
+                expr = self.expr()
+                self.consume("RIGHT_BRACKET")
+                return expr
+            case _ if token.type in self.operatorpriority.keys():
+                expr = self.expr()
+                return expr
+            case "INT" | "FLOAT":
+                return {
+                    "type": "literal",
+                    "valtype": token.type,
+                    "value": token.value
+                }
+            case "BOOL":
+                return {
+                    "type": "literal",
+                    "valtype": "bool",
+                    "value": token.value == "true"
+                }
+            case "STRING":
+                return {
+                    "type": "literal",
+                    "valtype": "string",
+                    "value": token.value
+                }
+            case "ID":
+                return {
+                    "type": "variable",
+                    "name": token.value
+                }
+            case _:
+                raise ParseError(f"invalid expression token {token.type}")
 
     def evalcond(self):
         # TODO: fix this
