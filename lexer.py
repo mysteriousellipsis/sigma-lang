@@ -139,14 +139,14 @@ if __name__ == '__main__':
             if flag == "--debug":
                 for file in args:
                     code = open(file, 'r').read()
-            elif flag == "--default-debug":
+            elif flag == "--default":
                 code = '''
-new int variablename is ((5 multiplied by 4) plus (1 plus 3))
-print variablename
+new int var iablename is ((5 multiplied by 4) plus (1 plus 3))
+print iablename
 print"variablename"
 '''
-            try:
-                lexer = Lexer(code)
-                print(f"code: \n{code}\n\ntokens: {lexer.tokenize()}")
-            except:
-                pass
+            print(f"code: \n{code}")
+            lexer = Lexer(code)
+            tokens = lexer.tokenize()
+
+            print(f"tokens: {tokens}")

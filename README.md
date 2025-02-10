@@ -22,7 +22,6 @@ while loops
 user input  
 output  
 
-
 ### completed, not tested
 
 ### in progress
