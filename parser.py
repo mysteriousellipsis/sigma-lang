@@ -14,13 +14,25 @@ class Parser:
         self.operatorpriority = {
                     "MULTIPLY": 3, "DIVIDE": 3,
                     "ADD": 2, "MINUS": 2,
-                    "EQUALS": 1, "GREATER": 1, "LESS": 1
+                    "EQUALS": 1, "GREATER": 1, "LESS": 1, "NOT": 1
                 }
 
-    def curr(self):
-        return self.tokens[self.pos] if self.pos < len(self.tokens) else None
+    def curr(self, pos=0):
+        '''
+        returns the token at the current index
+        '''
+        return self.tokens[self.pos+pos] if self.pos+pos < len(self.tokens) else None
+
+    def peek(self):
+        '''
+        returns the token at the next index
+        '''
+        return self.curr(1)
 
     def consume(self, expected=None):
+        '''
+        returns the token at the current index then moves on to the next index
+        '''
         token = self.curr()
 
         if not token:
@@ -34,6 +46,7 @@ class Parser:
         return token
 
     def parse(self):
+        '''main function'''
         ast = []
 
         while self.curr():
@@ -42,6 +55,9 @@ class Parser:
         return ast
 
     def parseline(self):
+        '''
+        parses a "line"
+        '''
         token = self.curr()
 
         if not token:
@@ -165,38 +181,39 @@ class Parser:
 
     def output(self):
         self.consume("OUTPUT")
-        try:
-            self.consume("OUTPUT_NEWLINE")
-            value = self.expr()
-            return {
-                "type": "output",
-                "value": value,
-                "newline": True
-            }
-        except:
-            value = self.expr()
-            return {
-                "type": "output",
-                "value": value,
-                "newline": False
-            }
+        match self.curr().type:
+            case "OUTPUT_NEWLINE":
+                self.consume("OUTPUT_NEWLINE")
+                value = self.expr()
+                return {
+                    "type": "output",
+                    "value": value,
+                    "newline": True
+                }
+            case _:
+                value = self.expr()
+                return {
+                    "type": "output",
+                    "value": value,
+                    "newline": False
+                }
+
 
     def receive(self):
         self.consume("INPUT")
-        try:
-            self.consume("TO")
-            target = self.consume("ID").value
+        match self.curr().type:
+            case "TO":
+                target = self.consume("ID").value
 
-            return {
-                "type": "input",
-                "target": target
-            }
-
-        except:
-            return {
-                "type": "input",
-                "target": None
-            }
+                return {
+                    "type": "input",
+                    "target": target
+                }
+            case _:
+                return {
+                    "type": "input",
+                    "target": None
+                }
 
     def reassign(self):
         self.consume("REASSIGNMENT_IDENT")
@@ -241,12 +258,10 @@ class Parser:
             expr = self.expr()
             self.consume("RIGHT_BRACKET")
             return expr
-
-        if token.type in self.operatorpriority.keys():
+        elif token.type in self.operatorpriority.keys():
             expr = self.expr()
             return expr
-
-        if token.type in {"INT", "FLOAT"}:
+        elif token.type in {"INT", "FLOAT"}:
             return {
                 "type": "literal",
                 "valtype": token.type,

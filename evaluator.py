@@ -118,13 +118,13 @@ class Evaluator:
                 return expr["value"]
 
             try:
-                if expr["valtype"] == "INT":
-                    return int(expr["value"])
-                elif expr["valtype"] == "FLOAT":
-                    return float(expr["value"])
-                else:
-                    return expr["value"]
-
+                match expr['valtype']:
+                    case "INT":
+                        return int(expr["value"])
+                    case "FLOAT":
+                        return float(expr["value"])
+                    case _:
+                        return expr["value"]
             except:
                 return expr["value"]
         elif expr["type"] == "variable":
@@ -150,13 +150,13 @@ class Evaluator:
                 case "NOT":
                     return left != right
                 case "ADD":
-                    return left+right
+                    return left + right
                 case "MULTIPLY":
-                    return left*right
+                    return left * right
                 case "SUBTRACT":
-                    return left*right
+                    return left * right
                 case "DIVIDE":
-                    return left/right
+                    return left / right
                 case _:
                     raise RuntimeError(f"unknown comparison operator: {op}")
         else:
