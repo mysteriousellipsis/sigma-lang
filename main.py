@@ -5,9 +5,10 @@ from evaluator import *
 from globals import *
 
 def validatepython():
+    '''python version check'''
     minimum = (3, 10)
     if sys.version_info < minimum:
-        print("python version 3.10 or high required")
+        print(f"python version {'.'.join([str(n) for n in minimum])} or high required")
         sys.exit()
 
 def validatefile(filename):
