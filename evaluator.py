@@ -1,8 +1,8 @@
 import sys
-from lexer import *
-from parser import *
-from const import *
-from globals import *
+from lexer import Lexer
+from parser import Parser
+from const import syserr
+from globals import variables, constants
 
 # TODO
 

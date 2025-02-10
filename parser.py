@@ -1,6 +1,6 @@
 import sys
-from lexer import *
-from const import *
+from lexer import Lexer
+from const import KEYWORDS, syserr
 
 class ParseError(Exception):
     def __init__(self, message = ""):
@@ -95,14 +95,13 @@ class Parser:
 
         constvar = self.consume()
 
-        if constvar.type == "CONST":
-            isconst = True
-
-        elif constvar.type == "VAR":
-            isconst = False
-
-        else:
-            raise ParseError(f"expected {KEYWORDS["CONST"]} or {KEYWORDS["VAR"]} after {KEYWORDS["NEW_VAR_IDENT"]}")
+        match constvar.type:
+            case "CONST":
+                isconst = True
+            case "VAR":
+                isconst = False
+            case _:
+                raise ParseError(f"expected {KEYWORDS["CONST"]} or {KEYWORDS["VAR"]} after {KEYWORDS["NEW_VAR_IDENT"]}")
 
         idtok = self.consume("ID")
         varname = idtok.value
@@ -138,7 +137,6 @@ class Parser:
             elifcond = self.evalcond()
             self.consume("THEN")
             self.consume("DO")
-
             elifbody = []
             while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
                 elifbody.append(self.parseline())

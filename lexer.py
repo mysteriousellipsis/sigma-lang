@@ -1,16 +1,16 @@
 import re
 import sys
-from const import *
+from const import KEYWORDS
 
 keywordsinv = {}
-for k,v in KEYWORDS.items():
-    if isinstance(v, list):
-        for item in v:
-            keywordsinv[item] = k
-    elif isinstance(v, set):
+for key, value in KEYWORDS.items():
+    if isinstance(value, list):
+        for item in value:
+            keywordsinv[item] = key
+    elif isinstance(value, set):
         continue
     else:
-        keywordsinv[v] = k
+        keywordsinv[value] = key
 
 keywords = []
 
