@@ -136,8 +136,6 @@ class Evaluator:
             right = self.evalexpr(expr["right"])
             op = expr["op"]
 
-            print(op == "EQUALS")
-
             match op:
                 case "GREATER":
                     return left > right
