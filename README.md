@@ -18,6 +18,7 @@ head over to [syntax.md](https://github.com/dimini171/sigma/blob/v2/SYNTAX.md) t
 comments  
 variables  
 conditionals  
+math  
 while loops  
 user input  
 output  
@@ -25,12 +26,10 @@ output
 ### completed, not tested
 
 ### in progress
-variable name fix  
-inline math  
-nested logic  
+f strings  
+arrays  
 
 ### roadmap
-f strings  
 iterables  
 try-except  
 functions

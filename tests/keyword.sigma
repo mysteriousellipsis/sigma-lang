@@ -1,4 +1,4 @@
-new int var variable is 2
+let int var variable be 2
 
 print variable
 print line variable

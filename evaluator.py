@@ -1,4 +1,5 @@
 import sys
+from re import compile
 from lexer import Lexer
 from parser import Parser
 from const import syserr
@@ -12,10 +13,12 @@ class Evaluator:
         self.constants = constants
 
     def evaluate(self, ast):
+        '''entry point'''
         for node in ast:
             self.evalnode(node)
 
     def evalnode(self, node):
+        '''evaluates one node'''
         if not node:
             return
 
@@ -37,7 +40,22 @@ class Evaluator:
             case _:
                 raise RuntimeError(f"unknown node type {type_} {syserr}")
 
+    def interpolate(self, s):
+        '''helper function to evaluate interpolated strings'''
+        pattern = compile(r'\$\((\w+)\)')
+
+        def repl(match):
+            varname = match.group(1)
+            if varname in self.variables:
+                return str(self.variables[varname][0])
+            else:
+                raise RuntimeError(f"undefined variable '{varname}'")
+
+        return pattern.sub(repl, s)
+
+
     def decl(self, node):
+        '''handles declaration of variables'''
         varname = node["name"]
         vartype = node["vartype"]
         isconst = node["isconst"]
@@ -53,6 +71,7 @@ class Evaluator:
                 self.constants[varname] = vartype
 
     def ifelse(self, node):
+        '''handles if else statements'''
         condition = self.evalexpr(node["condition"])
         if condition:
             self.evaluate(node["body"])
@@ -66,10 +85,12 @@ class Evaluator:
         self.evaluate(node["elsebody"])
 
     def whileloop(self, node):
+
         while self.evalexpr(node["condition"]):
             self.evaluate(node["body"])
 
     def output(self, node):
+        '''handles print statements'''
         value = self.evalexpr(node["value"])
         newline = node["newline"]
         if newline:
@@ -78,6 +99,7 @@ class Evaluator:
             print(value, end="")
 
     def receive(self, node):
+        '''handles input'''
         target = node["target"]
         if not target:
             input()
@@ -120,7 +142,9 @@ class Evaluator:
                     case "INT":
                         return int(expr["value"])
                     case "FLOAT":
-                        return int(expr["value"])
+                        return float(expr["value"])
+                    case "STRING":
+                        return self.interpolate(expr["value"])
                     case _:
                         return expr["value"]
             case "variable":
@@ -150,7 +174,7 @@ class Evaluator:
                     case "MULTIPLY":
                         return left * right
                     case "SUBTRACT":
-                        return left * right
+                        return left - right
                     case "DIVIDE":
                         return left / right
                     case _:

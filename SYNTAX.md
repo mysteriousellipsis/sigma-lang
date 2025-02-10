@@ -40,9 +40,8 @@ variables are stored as a dictionary (globals.py > variables)
 
 ## assigning
 ```bash
-new <type> var <name> is <expression>
-new <type> const <name> is <expression>
-new <type> var <name> 
+let <type> var <name> be <expression>
+let <type> const <name> be <expression> 
 ```
 
 ## reassigning 
@@ -53,8 +52,8 @@ change <name> to <value>
 ## examples
 sigmalang:
 ```bash
-new variable int count is 5
-new constant string message is "hello, world!"
+let variable int count be 5
+let constant string message be "hello, world!"
 change count to 10
 ```
 python equivalent:
@@ -178,4 +177,12 @@ receive to variable
 print "input username: "
 receive to username
 print "welcome, ${username}"
+```
+
+# TO BE ADDED
+# functions
+```bash
+function foo (<param> as <type>) as
+    expression
+end function
 ```

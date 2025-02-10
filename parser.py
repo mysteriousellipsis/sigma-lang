@@ -267,13 +267,13 @@ class Parser:
             case "BOOL":
                 return {
                     "type": "literal",
-                    "valtype": "bool",
+                    "valtype": "BOOL",
                     "value": token.value == "true"
                 }
             case "STRING":
                 return {
                     "type": "literal",
-                    "valtype": "string",
+                    "valtype": "STRING",
                     "value": token.value
                 }
             case "ID":

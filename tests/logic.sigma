@@ -1,4 +1,4 @@
-new bool var a is true
+let bool var a be true
 
 print line (1 is not 2)
 

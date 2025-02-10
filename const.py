@@ -18,10 +18,10 @@ KEYWORDS = {
     "DO": "do",
 
     # assignment
-    "NEW_VAR_IDENT": "new",
+    "NEW_VAR_IDENT": "let",
     "CONST": "const",
     "VAR": "var",
-    "ASSIGNMENT_OPERATOR": "is",
+    "ASSIGNMENT_OPERATOR": "be",
     "REASSIGNMENT_IDENT": "change",
 
     # math

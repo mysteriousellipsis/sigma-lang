@@ -1,0 +1,6 @@
+let string var variable be "testing"
+
+print "testing print!! "
+print line "testing print line"
+
+print line "$(variable) variables in strings"

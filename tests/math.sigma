@@ -1,4 +1,4 @@
-new int var a is ((5 plus 5) multiplied by (4 plus 5))
+let int var a be ((5 plus 5) multiplied by (4 plus 5))
 
 print "a with nested math: "
 print line a
