@@ -22,11 +22,11 @@ math
 while loops  
 user input  
 output  
+interpolated strings  
 
 ### completed, not tested
 
-### in progress
-f strings  
+### in progress\
 arrays  
 
 ### roadmap
