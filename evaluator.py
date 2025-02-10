@@ -149,15 +149,6 @@ class Evaluator:
                     return left <= right
                 case "NOT":
                     return left != right
-                case _:
-                    raise RuntimeError(f"Unknown comparison operator: {op}")
-        elif expr["type"] == "operation":
-            # TODO: math
-            op = expr["op"]
-            left = self.evalexpr(expr["left"])
-            right = self.evalexpr(expr["right"])
-
-            match op:
                 case "ADD":
                     return left+right
                 case "MULTIPLY":
@@ -167,7 +158,7 @@ class Evaluator:
                 case "DIVIDE":
                     return left/right
                 case _:
-                    raise RuntimeError(f"unknown operator: {op}")
+                    raise RuntimeError(f"unknown comparison operator: {op}")
         else:
             raise RuntimeError(f"unknown expression type: {expr} {syserr}")
 
