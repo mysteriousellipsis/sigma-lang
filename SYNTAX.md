@@ -65,14 +65,14 @@ count = 10
 ```
 
 # data types
-integer: whole numbers (`1`, `42`)
-float: decimals (`3.14`, `2.71`)
-boolean: `true` or `false`
-nonetype: `none` or `nothing`
-string: any text enclosed in double quotes (`"hello, world!"`)
+integer: whole numbers (`1`, `42`)  
+float: decimals (`3.14`, `2.71`)  
+boolean: `true` or `false`  
+nonetype: `none` or `nothing`  
+string: any text enclosed in double quotes (`"hello, world!"`)  
 
-note: strings can include variables by using ${variablename}
-eg:
+note: strings can include variables by using ${variablename}  
+eg:  
 `print "the count is ${count}"`
 
 # comment
@@ -140,9 +140,9 @@ not equals to (!=)
 ```
 
 ## logical operators
-and: `and`
-or: `or`
-not: `not`
+and: `and`  
+or: `or`  
+not: `not`  
 
 ## example
 sigmalang:

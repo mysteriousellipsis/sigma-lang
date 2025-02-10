@@ -1,7 +1,9 @@
 new bool var a is true
 
-if (a is equal to true) then do
+if (a is equal to (1 is equal to 2)) then do
     print line "sigma sigma boy"
+elif (a is equal to (1 is less than 2)) then do
+    print line "sigma boy"
 else do
     print line "not sigma"
 fi

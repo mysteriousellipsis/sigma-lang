@@ -11,7 +11,7 @@ sigma lang was made for our final year computing coursework.
 it attempts to be a very simple to understand and learn, especially for absolute beginners and people who want to pick up programming, but find it too confusing or difficult.
 
 ## syntax
-head over to [syntax.md](https://github.com/mysteriousellipsis/sigma/blob/v2/SYNTAX.md) to read more
+head over to [syntax.md](https://github.com/dimini171/sigma/blob/v2/SYNTAX.md) to read more  
 
 ## progress on stuff
 ### implemented
