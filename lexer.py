@@ -17,11 +17,11 @@ keywords = []
 for phrase in keywordsinv.keys():
     keywords.append(phrase)
 
-keywords.sort(key=lambda x: len(x), reverse=True)
+keywords = sorted(keywordsinv.keys(), key=len, reverse=True)
 escapedkw = [re.escape(kw) for kw in keywords]
-kwpattern = '|'.join(escapedkw)\
+kwpattern = r'\b(?:' + '|'.join(escapedkw) + r')\b' # changed this so that it matches keywords and ids properly
 
-pattern = fr'''
+pattern = re.compile(fr'''
             (<--[\s\S]*?-->)|     # comments
             ("[^"]*"|'[^']*')|    # strings (stuff between "" and '')
             ({kwpattern})|        # stuff from const.py
@@ -30,7 +30,9 @@ pattern = fr'''
             (\w+)|                # identifiers
             (\n)|                 # newlines
             ([^\s\w])             # characters
-        '''
+        ''',
+        re.VERBOSE | re.DOTALL
+)
 
 class Token:
     def __init__(self, type_, value=None):
@@ -47,8 +49,12 @@ class Lexer:
         self.text = text
         self.pos = 0
 
-        self.words = re.findall(pattern, text, re.VERBOSE | re.DOTALL)
-        self.words = [next(group for group in match if group) for match in self.words]
+        # finds all matches
+        # extracts the first non-empty group from each match (tuple)
+        self.words = [
+            next(group for group in match if group)
+            for match in pattern.findall(text)
+        ]
 
         self.currword = self.words[self.pos] if self.pos < len(self.words) else None
 
@@ -59,7 +65,8 @@ class Lexer:
         else:
             self.currword = None
 
-    def isfloat(self, string):
+    @staticmethod
+    def isfloat(string):
         try:
             float(string)
             return True
@@ -69,59 +76,37 @@ class Lexer:
     def tokenize(self):
         tokens = []
 
-        while self.currword is not None:
-            word = self.currword
-
+        for word in self.words:
             if word == '\n':
                 tokens.append(Token('NEWLINE'))
-                self.next()
                 continue
-
-            if word.startswith('<--') and word.endswith('-->'):
-                self.next()
+            elif word.startswith('<--') and word.endswith('-->'):
                 continue
-
-            if word.startswith('"') and word.endswith('"') or word.startswith("'") and word.endswith("'"):
+            elif (word.startswith('"') and word.endswith('"')) or (word.startswith("'") and word.endswith("'")):
                 tokens.append(Token('STRING', word[1:-1]))
-                self.next()
                 continue
-
-            if word == '(':
+            elif word == '(':
                 tokens.append(Token('LEFT_BRACKET'))
-                self.next()
                 continue
             elif word == ')':
                 tokens.append(Token('RIGHT_BRACKET'))
-                self.next()
                 continue
-
-            if word in KEYWORDS["TYPE"]:
+            elif word in KEYWORDS["TYPE"]:
                 tokens.append(Token("TYPE", word))
-                self.next()
                 continue
-
             elif word in KEYWORDS['BOOL_TYPES']:
                 tokens.append(Token('BOOL', word))
-
             elif word in KEYWORDS['NONE_TYPES']:
                 tokens.append(Token('NONETYPE', word))
-
             elif word.isdigit():
                 tokens.append(Token('INT', word))
-
             elif self.isfloat(word):
                 tokens.append(Token("FLOAT", word))
-
             elif word in keywordsinv:
                 tokens.append(Token(keywordsinv[word]))
-                self.next()
                 continue
-
             else:
                 tokens.append(Token("ID", word))
-
-            self.next()
-
         return tokens
 
 # for easier debugging
