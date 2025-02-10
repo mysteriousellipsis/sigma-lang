@@ -126,27 +126,22 @@ class Lexer:
 
 # for easier debugging
 if __name__ == '__main__':
-    flag = None
-    if len(sys.argv) > 1:
-        try:
-            flag = sys.argv[1]
-        except:
-            pass
+    flag = sys.argv[1] if len(sys.argv) > 1 else None
+    args = sys.argv[2:]
 
-        args = sys.argv[2:]
-        if flag:
-            code = None
-            if flag == "--debug":
-                for file in args:
-                    code = open(file, 'r').read()
-            elif flag == "--default":
-                code = '''
+    code = None
+    if flag == "--debug":
+        code = "\n".join(open(file, 'r').read() for file in args)
+    elif flag == "--default":
+        code = '''
 new int var iablename is ((5 multiplied by 4) plus (1 plus 3))
 print iablename
 print"variablename"
 '''
-            print(f"code: \n{code}")
-            lexer = Lexer(code)
-            tokens = lexer.tokenize()
 
-            print(f"tokens: {tokens}")
+    if code:
+        print(f"code: \n{code}")
+
+        lexer = Lexer(code)
+        tokens = lexer.tokenize()
+        print(f"tokens: {tokens}\n\n")

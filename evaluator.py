@@ -21,20 +21,21 @@ class Evaluator:
 
         type_ = node.get("type")
 
-        if type_ == "declaration":
-            self.decl(node)
-        elif type_ == "if":
-            self.ifelse(node)
-        elif type_ == "while":
-            self.whileloop(node)
-        elif type_ == "output":
-            self.output(node)
-        elif type_ == "input":
-            self.receive(node)
-        elif type_ == "reassignment":
-            self.reassign(node)
-        else:
-            raise RuntimeError(f"unknown node type {type_} {syserr}")
+        match type_:
+            case "declaration":
+                self.decl(node)
+            case "if":
+                self.ifelse(node)
+            case "while":
+                self.whileloop(node)
+            case "output":
+                self.output(node)
+            case  "input":
+                self.receive(node)
+            case "reassignment":
+                self.reassign(node)
+            case _:
+                raise RuntimeError(f"unknown node type {type_} {syserr}")
 
     def decl(self, node):
         varname = node["name"]
@@ -90,13 +91,13 @@ class Evaluator:
         exptype = self.variables[target][1]
 
         try:
-            if exptype == "int":
-                self.variables[target][0] = int(usrinp)
-            elif exptype == "float":
-                self.variables[target][0] = float(usrinp)
-            else:
-                self.variables[target][0] = usrinp
-
+            match exptype:
+                case "int":
+                    self.variables[target][0] = int(usrinp)
+                case "float":
+                    self.variables[target][0] = float(usrinp)
+                case _:
+                    self.variables[target][0] = usrinp
         except ValueError:
             raise RuntimeError(f"input should be {exptype} but wrong type was provided")
 
@@ -159,36 +160,29 @@ class Evaluator:
 
 # for easier debugging
 if __name__ == '__main__':
-    flag = None
-    if len(sys.argv) > 1:
-        try:
-            flag = sys.argv[1]
-        except:
-            pass
+    flag = sys.argv[1] if len(sys.argv) > 1 else None
+    args = sys.argv[2:]
 
-        args = sys.argv[2:]
-        if flag:
-            code = None
-            if flag == "--debug":
-                for file in args:
-                    code = open(file, 'r').read()
-            elif flag == "--default":
-                code = '''
+    code = None
+    if flag == "--debug":
+        code = "\n".join(open(file, 'r').read() for file in args)
+    elif flag == "--default":
+        code = '''
 new int var iablename is ((5 multiplied by 4) plus (1 plus 3))
 print iablename
 print"variablename"
 '''
-            print(f"code: \n{code}")
-            lexer = Lexer(code)
-            tokens = lexer.tokenize()
 
-            print(f"tokens: {tokens}\n\n")
+    if code:
+        print(f"code: \n{code}")
 
-            parser = Parser(tokens)
-            ast = parser.parse()
+        lexer = Lexer(code)
+        tokens = lexer.tokenize()
+        print(f"tokens: {tokens}\n\n")
 
-            print(f"ast: {ast}\n\n")
+        parser = Parser(tokens)
+        ast = parser.parse()
+        print(f"ast: {ast}\n\n")
 
-            print(f"output: ")
-            evaluator = Evaluator()
-            evaluator.evaluate(ast)
+        print("output:")
+        Evaluator().evaluate(ast)
