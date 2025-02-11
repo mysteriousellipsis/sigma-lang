@@ -1,0 +1,36 @@
+let int var count be 0
+
+print line "starting counter"
+
+while (count is less than 5) do
+    print line "count is $(count)"
+    change count to (count plus 1)
+elihw
+
+print line "flow diversion"
+
+while (true) do
+    print line "attempting to break"
+    break
+elihw
+
+print line "pass"
+
+while (true) do
+    print line "attempting to continue"
+    continue
+    print line "pass"
+    break
+elihw
+
+while (true) do
+    if (count is less than 5) then do
+        print line "works"
+    fi
+
+    print line "attempting to pass"
+    change count to (count plus 1)
+    pass
+elihw
+
+print line "completed"

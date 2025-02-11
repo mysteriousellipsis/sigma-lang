@@ -86,6 +86,12 @@ class Parser:
                 return None
             case "TRY_OPEN":
                 return self.tryexcept()
+            case "BREAK" | "CONTINUE" | "PASS":
+                self.pos += 1
+                return {
+                    "type": "flow",
+                    "name": token.type.lower()
+                }
             case _:
                 raise ParseError(f"unexpected token {token} {syserr}")
 

@@ -25,18 +25,20 @@ class Evaluator:
         type_ = node.get("type")
 
         match type_:
-            case "try":
-                self.tryexcept(node)
-            case "declaration":
-                self.decl(node)
             case "if":
                 self.ifelse(node)
+            case "try":
+                self.tryexcept(node)
+            case "flow":
+                self.flowcontrol(node)
+            case "input":
+                self.receive(node)
             case "while":
                 self.whileloop(node)
             case "output":
                 self.output(node)
-            case  "input":
-                self.receive(node)
+            case "declaration":
+                self.decl(node)
             case "reassignment":
                 self.reassign(node)
             case _:
