@@ -12,12 +12,12 @@ class Evaluator:
         self.variables = variables
         self.constants = constants
 
-    def evaluate(self, ast):
+    def evaluate(self, ast, mainloop=False):
         '''so that the loop isnt dead the instant theres a break or continue'''
         for node in ast:
             result = self.evalnode(node)
-            if result in {"break", "continue", "pass"}:
-                yield result
+            if result in {"break", "continue"} and not mainloop:
+                return result
 
     def evalnode(self, node):
         '''evaluates one node'''
@@ -114,7 +114,7 @@ class Evaluator:
         while self.evalexpr(node["condition"]):
             result = self.evaluate(node["body"])
             if result == "break":
-                return "break"
+                return
             elif result == "continue":
                 continue
 
@@ -238,4 +238,4 @@ print"variablename"
         print(f"ast: {ast}\n\n")
 
         print("output:")
-        Evaluator().evaluate(ast)
+        Evaluator().evaluate(ast, mainloop=True)

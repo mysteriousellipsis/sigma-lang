@@ -37,7 +37,7 @@ def runfile(filename):
         parser = Parser(tokens)
         ast = parser.parse()
         evaluator = Evaluator()
-        evaluator.evaluate(ast)
+        evaluator.evaluate(ast, mainloop=True)
     except FileNotFoundError:
         print(f"error: {filename} not found")
     except KeyboardInterrupt:
