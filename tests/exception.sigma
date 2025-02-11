@@ -1,0 +1,12 @@
+let int var usrinp be 0
+
+while (true) do
+    print "enter a number: "
+    try do
+        receive to usrinp
+        print "you entered: "
+        print line usrinp
+    except do
+        print line "please input a proper number"
+    yrt
+elihw

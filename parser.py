@@ -63,28 +63,31 @@ class Parser:
         if not token:
             return None
 
-        if token.type == "NEW_VAR_IDENT":
-            return self.decl()
-        elif token.type == "IF_OPEN":
-            return self.ifelse()
-        elif token.type == "WHILE_OPEN":
-            return self.whileloop()
-        elif token.type == "OUTPUT":
-            return self.output()
-        elif token.type == "INPUT":
-            return self.receive()
-        elif token.type == "REASSIGNMENT_IDENT":
-            return self.reassign()
-        elif token.type == "ID":
-            return self.expr()
-        elif token.type == "COMMENT_OPEN":
-            self.consume("COMMENT_OPEN")
-            return None
-        elif token.type == "NEWLINE":
-            self.consume("NEWLINE")
-            return None
-        else:
-            raise ParseError(f"unexpected token {token} {syserr}")
+        match token.type:
+            case "NEW_VAR_IDENT":
+                return self.decl()
+            case "IF_OPEN":
+                return self.ifelse()
+            case "WHILE_OPEN":
+                return self.whileloop()
+            case "OUTPUT":
+                return self.output()
+            case "INPUT":
+                return self.receive()
+            case "REASSIGNMENT_IDENT":
+                return self.reassign()
+            case "ID":
+                return self.expr()
+            case "COMMENT_OPEN":
+                self.consume("COMMENT_OPEN")
+                return None
+            case "NEWLINE":
+                self.consume("NEWLINE")
+                return None
+            case "TRY_OPEN":
+                return self.tryexcept()
+            case _:
+                raise ParseError(f"unexpected token {token} {syserr}")
 
 
     def decl(self):
@@ -117,6 +120,32 @@ class Parser:
             "vartype": vartype,
             "isconst": isconst,
             "value": value
+        }
+
+    def tryexcept(self):
+        self.consume("TRY_OPEN")
+        self.consume("DO")
+
+        if self.curr() == "NEWLINE":
+            self.consume("NEWLINE")
+
+        trybody = []
+        while self.curr() and self.curr().type != "EXCEPT":
+            trybody.append(self.parseline())
+
+        self.consume("EXCEPT")
+        self.consume("DO")
+
+        exceptbody = []
+        while self.curr() and self.curr().type != "TRY_CLOSE":
+            exceptbody.append(self.parseline())
+
+        self.consume("TRY_CLOSE")
+
+        return {
+            "type": "try",
+            "try": trybody,
+            "except": exceptbody,
         }
 
     def ifelse(self):
@@ -200,6 +229,7 @@ class Parser:
         self.consume("INPUT")
         match self.curr().type:
             case "TO":
+                self.consume("TO")
                 target = self.consume("ID").value
 
                 return {

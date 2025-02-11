@@ -25,6 +25,8 @@ class Evaluator:
         type_ = node.get("type")
 
         match type_:
+            case "try":
+                self.tryexcept(node)
             case "declaration":
                 self.decl(node)
             case "if":
@@ -53,6 +55,14 @@ class Evaluator:
 
         return pattern.sub(repl, s)
 
+    def tryexcept(self, node):
+        '''handles try-except functions'''
+        try:
+            self.evaluate(node["try"])
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
+        except:
+            self.evaluate(node["except"])
 
     def decl(self, node):
         '''handles declaration of variables'''

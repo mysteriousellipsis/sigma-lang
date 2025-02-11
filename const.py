@@ -75,4 +75,9 @@ KEYWORDS = {
     # shell variables
     "EXIT_SHELL_STATEMENT": ["quit", "exit", "stop", "q"],
     "SHELL_PROMPT": ">> ",
+
+    # try-except
+    "TRY_OPEN": "try",
+    "EXCEPT": "except",
+    "TRY_CLOSE": "yrt"
 }

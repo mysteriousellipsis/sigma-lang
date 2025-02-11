@@ -94,7 +94,7 @@ sigmalang:
 ```bash
 while (count is greater than 0) do
     print "count: ${count}"
-    count change to count minus 1
+    change count to (count minus 1)
 elihw
 ```
 python equivalent:
@@ -185,4 +185,13 @@ print "welcome, ${username}"
 function foo (<param> as <type>) as
     expression
 end function
+```
+
+# try except
+```bash
+try do
+    expression
+except do
+    expression
+yrt
 ```

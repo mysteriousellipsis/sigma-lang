@@ -23,13 +23,12 @@ while loops
 user input  
 output  
 interpolated strings  
+try-except loops  
 
-### completed, not tested
-
-### in progress\
+### in progress
+break, pass, continue  
 arrays  
 
 ### roadmap
 iterables  
-try-except  
 functions
