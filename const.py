@@ -35,7 +35,7 @@ KEYWORDS = {
     "EQUALS": "is equal to",
     "GTE": "is greater than or equal to",
     "LTE": "is less than or equal to",
-    "GREATER": "is greater than",
+    "GREATER": "is more than",
     "LESS": "is less than",
     "NOT": "is not",
     "LOGICAL_AND": "and",

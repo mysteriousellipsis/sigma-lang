@@ -15,7 +15,11 @@ class Evaluator:
     def evaluate(self, ast):
         '''entry point'''
         for node in ast:
-            self.evalnode(node)
+            result = self.evalnode(node)
+            print(result)
+            if result in {"break", "continue", "pass"}:
+                return result
+        return None
 
     def evalnode(self, node):
         '''evaluates one node'''
@@ -30,7 +34,7 @@ class Evaluator:
             case "try":
                 self.tryexcept(node)
             case "flow":
-                self.flowcontrol(node)
+                return self.flowcontrol(node)
             case "input":
                 self.receive(node)
             case "while":
@@ -56,6 +60,10 @@ class Evaluator:
                 raise RuntimeError(f"undefined variable '{varname}'")
 
         return pattern.sub(repl, s)
+
+    def flowcontrol(self, node):
+        '''handles break, etc'''
+        return node["name"]
 
     def tryexcept(self, node):
         '''handles try-except functions'''
@@ -86,20 +94,21 @@ class Evaluator:
         '''handles if else statements'''
         condition = self.evalexpr(node["condition"])
         if condition:
-            self.evaluate(node["body"])
-            return
+            return self.evaluate(node["body"])
 
         for elifcond, elifbody in node["elifs"]:
             if self.evalexpr(elifcond):
-                self.evaluate(elifbody)
-                return
+                return self.evaluate(elifbody)
 
-        self.evaluate(node["elsebody"])
+        return self.evaluate(node["elsebody"])
 
     def whileloop(self, node):
-
         while self.evalexpr(node["condition"]):
-            self.evaluate(node["body"])
+            result = self.evaluate(node["body"])
+            if result == "break":
+                break
+            elif result == "continue":
+                continue
 
     def output(self, node):
         '''handles print statements'''

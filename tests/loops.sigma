@@ -17,15 +17,23 @@ elihw
 print line "pass"
 
 while (true) do
+    change count to (count plus 1)
+    if (count is more than 6) then do
+        print line "works"
+        break
+    fi
+
     print line "attempting to continue"
+    print "count: $(count)"
     continue
     print line "pass"
     break
 elihw
 
 while (true) do
-    if (count is less than 5) then do
+    if (count is more than 7) then do
         print line "works"
+        break
     fi
 
     print line "attempting to pass"
