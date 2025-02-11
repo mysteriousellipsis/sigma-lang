@@ -13,7 +13,7 @@ class Parser:
         self.pos = 0
         self.operatorpriority = {
                     "MULTIPLY": 3, "DIVIDE": 3,
-                    "ADD": 2, "MINUS": 2,
+                    "ADD": 2, "SUBTRACT": 2,
                     "EQUALS": 1, "GREATER": 1, "LESS": 1, "NOT": 1
                 }
 

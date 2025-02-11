@@ -5,8 +5,6 @@ from parser import Parser
 from const import syserr
 from globals import variables, constants
 
-# TODO
-
 class Evaluator:
     def __init__(self):
         self.variables = variables
@@ -39,6 +37,8 @@ class Evaluator:
                 return self.whileloop(node)
             case "output":
                 return self.output(node)
+            # case "variable":
+            #     raise RuntimeError(f"")
             case "declaration":
                 return self.decl(node)
             case "reassignment":
