@@ -13,13 +13,11 @@ class Evaluator:
         self.constants = constants
 
     def evaluate(self, ast):
-        '''entry point'''
+        '''so that the loop isnt dead the instant theres a break or continue'''
         for node in ast:
             result = self.evalnode(node)
-            print(result)
             if result in {"break", "continue", "pass"}:
-                return result
-        return None
+                yield result
 
     def evalnode(self, node):
         '''evaluates one node'''
@@ -30,21 +28,21 @@ class Evaluator:
 
         match type_:
             case "if":
-                self.ifelse(node)
+                return self.ifelse(node)
             case "try":
-                self.tryexcept(node)
+                return self.tryexcept(node)
             case "flow":
                 return self.flowcontrol(node)
             case "input":
-                self.receive(node)
+                return self.receive(node)
             case "while":
-                self.whileloop(node)
+                return self.whileloop(node)
             case "output":
-                self.output(node)
+                return self.output(node)
             case "declaration":
-                self.decl(node)
+                return self.decl(node)
             case "reassignment":
-                self.reassign(node)
+                return self.reassign(node)
             case _:
                 raise RuntimeError(f"unknown node type {type_} {syserr}")
 
@@ -68,11 +66,15 @@ class Evaluator:
     def tryexcept(self, node):
         '''handles try-except functions'''
         try:
-            self.evaluate(node["try"])
+            result = self.evaluate(node["try"])
+            if result in {"break", "continue"}:
+                return result
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except:
-            self.evaluate(node["except"])
+            result = self.evaluate(node["except"])
+            if result in {"break", "continue"}:
+                return result
 
     def decl(self, node):
         '''handles declaration of variables'''
@@ -94,19 +96,25 @@ class Evaluator:
         '''handles if else statements'''
         condition = self.evalexpr(node["condition"])
         if condition:
-            return self.evaluate(node["body"])
+            result = self.evaluate(node["body"])
+            if result in {"break", "continue"}:
+                return result
 
         for elifcond, elifbody in node["elifs"]:
             if self.evalexpr(elifcond):
-                return self.evaluate(elifbody)
+                result = self.evaluate(elifbody)
+                if result in {"break", "continue"}:
+                    return result
 
-        return self.evaluate(node["elsebody"])
+        result = self.evaluate(node["elsebody"])
+        if result in {"break", "continue"}:
+            return result
 
     def whileloop(self, node):
         while self.evalexpr(node["condition"]):
             result = self.evaluate(node["body"])
             if result == "break":
-                break
+                return "break"
             elif result == "continue":
                 continue
 

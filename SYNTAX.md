@@ -120,7 +120,7 @@ less than or equal to (<=)
 equals to (==)
 
 ```bash
-<statement> is equal to <statement>
+<statement> equals <statement>
 ```
 
 greater than (>)
@@ -179,14 +179,6 @@ receive to username
 print "welcome, ${username}"
 ```
 
-# TO BE ADDED
-# functions
-```bash
-function foo (<param> as <type>) as
-    expression
-end function
-```
-
 # try except
 ```bash
 try do
@@ -194,4 +186,12 @@ try do
 except do
     expression
 yrt
+```
+
+# TO BE ADDED
+# functions
+```bash
+function foo (<param> as <type>) as
+    expression
+end function
 ```

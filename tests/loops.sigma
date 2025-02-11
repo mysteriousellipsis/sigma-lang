@@ -1,44 +1,42 @@
-let int var count be 0
+print line "testing break"
 
-print line "starting counter"
-
-while (count is less than 5) do
-    print line "count is $(count)"
-    change count to (count plus 1)
-elihw
-
-print line "flow diversion"
-
-while (true) do
-    print line "attempting to break"
-    break
-elihw
-
-print line "pass"
-
-while (true) do
-    change count to (count plus 1)
-    if (count is more than 6) then do
-        print line "works"
+let int var x be 0
+while (x is less than 5) do
+    change x to (x plus 1)
+    if (x equals 3) then do
+        print line "x equals 3"
         break
     fi
-
-    print line "attempting to continue"
-    print "count: $(count)"
-    continue
-    print line "pass"
-    break
+    print line x
 elihw
 
-while (true) do
-    if (count is more than 7) then do
-        print line "works"
-        break
-    fi
+<-- expected: loop stops when x is 3 -->
 
-    print line "attempting to pass"
-    change count to (count plus 1)
+<-- print line -->
+print line "testing continue"
+
+change x to 0
+while (x is less than 5) do
+    change x to (x plus 1)
+    if (x equals 3) then do
+        print line "x equals 3"
+        continue
+    fi
+    print line x
+elihw
+
+<-- expected: loop skips 3 -->
+
+<-- print line -->
+print line "testing pass"
+
+change x to 0
+while (x is less than 3) do
+    change x to (x plus 1)
     pass
+    print line x
 elihw
 
-print line "completed"
+<-- expected: nothing happens -->
+
+print line "all tests done"

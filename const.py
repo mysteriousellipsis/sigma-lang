@@ -32,8 +32,8 @@ KEYWORDS = {
     "MATH_OPERATORS": {"ADD", "SUBTRACT", "DIVIDE", "MULTIPLY"},
 
     # logic
-    "EQUALS": "is equal to",
-    "GTE": "is greater than or equal to",
+    "EQUALS": "equals",
+    "GTE": "is more than or equal to",
     "LTE": "is less than or equal to",
     "GREATER": "is more than",
     "LESS": "is less than",
