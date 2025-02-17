@@ -1,115 +1,156 @@
 import re
 import sys
-from const import KEYWORDS
+import const
+from typing import Any, Dict, List, Optional, Pattern
 
-keywordsinv = {}
-for key, value in KEYWORDS.items():
-    if isinstance(value, list):
-        for item in value:
-            keywordsinv[item] = key
-    elif isinstance(value, set):
+'''
+lexer for the language
+tokenizes the input into tokens (duh) that the parser can understand.
+this part of the program removes noise like whitespace and comments
+'''
+
+
+# this chunk of code is a little confusing
+#
+# keywordsinv: inverted version of const.KEYWORDS
+# keywordsonly: list of keys of const.KEYWORDS, sorted by length in descending order
+# escapedkw and kwpattern: regex related variables, dont touch unless you know what you're doing
+
+keywordsinv: Dict[str, str] = {}
+for key, value in const.KEYWORDS.items():
+    if key in const.NOLOOKUP:
         continue
-    else:
+    if isinstance(value, dict):
+        # for nested dictionaries (e.g. MATH_OPERATORS, LOGICAL_OPERATORS)
+        for inner_key, inner_val in value.items():
+            keywordsinv[inner_val] = inner_key
+    elif isinstance(value, str):
         keywordsinv[value] = key
 
-keywords = []
+keywordsonly: List[str] = sorted(list(keywordsinv.keys()), key=len, reverse=True)
+escapedkw: List[str] = [re.escape(kw) for kw in keywordsonly]
+kwpattern: str = r'\b(?:' + '|'.join(escapedkw) + r')\b' # changed this so that it matches keywords and ids only if they are not part of a larger word
 
-for phrase in keywordsinv.keys():
-    keywords.append(phrase)
-
-keywords = sorted(keywordsinv.keys(), key=len, reverse=True)
-escapedkw = [re.escape(kw) for kw in keywords]
-kwpattern = r'\b(?:' + '|'.join(escapedkw) + r')\b' # changed this so that it matches keywords and ids properly
-
-pattern = re.compile(fr'''
-            (<--[\s\S]*?-->)|     # comments
-            ("[^"]*"|'[^']*')|    # strings (stuff between "" and '')
-            ({kwpattern})|        # stuff from const.py
-            ([()])|               # parenthesis
-            (\d+\.\d+|\.\d+|\d+)| # ints and floats
-            (\w+)|                # identifiers
-            (\n)|                 # newlines
-            ([^\s\w])             # characters
+pattern: Pattern[str] = re.compile(fr'''
+            ({re.escape(const.KEYWORDS["COMMENT_OPEN"])}[\s\S]*?{re.escape(const.KEYWORDS["COMMENT_CLOSE"])}) |     # comments
+            ("[^"]*"|'[^']*') |    # strings (stuff between "" and '')
+            ({kwpattern}) |        # stuff from const.py
+            ([()]) |               # parenthesis
+            (\d+\.\d+|\.\d+|\d+) | # ints and floats
+            (\w+) |                # identifiers
+            (\n) |                 # newlines
+            ([^\s\w])              # characters
         ''',
         re.VERBOSE | re.DOTALL
 )
 
 class Token:
-    def __init__(self, type_, value=None):
-        self.type = type_
-        self.value = value
+    '''
+    token data type
+    '''
+    def __init__(self, type_: str, value: str="") -> None:
+        self.type: str = type_
+        self.value: str = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        # defines what the token looks like when printed
         if self.value:
             return f"{self.type}:{self.value}"
         return f"{self.type}"
 
+    def __eq__(self, other: Any) -> bool:
+        # defines how to compare tokens
+        if not isinstance(other, Token):
+            return False
+        return self.type == other.type and self.value == other.value
+
 class Lexer:
-    def __init__(self, text):
-        self.text = text
-        self.pos = 0
+    '''
+    actual lexer
+    '''
+    def __init__(self, text: str) -> None:
+        self.text: str = text
+        self.pos: int = 0
 
         # finds all matches
         # extracts the first non-empty group from each match (tuple)
-        self.words = [
+        self.words: List[str] = [
             next(group for group in match if group)
             for match in pattern.findall(text)
         ]
 
+        self.currword: Optional[str] = self.words[self.pos] if self.pos < len(self.words) else None
+
+    def next(self) -> None:
+        self.pos += 1
         self.currword = self.words[self.pos] if self.pos < len(self.words) else None
 
-    def next(self):
-        self.pos += 1
-        if self.pos < len(self.words):
-            self.currword = self.words[self.pos]
-        else:
-            self.currword = None
-
     @staticmethod
-    def isfloat(string):
+    def isfloat(x: str) -> bool:
+        '''
+        returns if argument `x` is a float without modifying the value
+        '''
         try:
-            float(string)
+            s = x
+            float(s)
             return True
         except ValueError:
             return False
 
-    def tokenize(self):
-        tokens = []
+    def tokenize(self) -> list[Token]:
+        '''
+        entry point
+        '''
+        tokens: List[Token] = []
 
         for word in self.words:
+            # newline
             if word == '\n':
                 tokens.append(Token('NEWLINE'))
                 continue
-            elif word.startswith('<--') and word.endswith('-->'):
+            # comments
+            elif word[0] == const.KEYWORDS['COMMENT_OPEN'] and word[-1] == const.KEYWORDS['COMMENT_CLOSE']:
                 continue
-            elif (word.startswith('"') and word.endswith('"')) or (word.startswith("'") and word.endswith("'")):
+            # strings
+            elif (word[0] in const.KEYWORDS['STRING_DELIMS'] and
+                  word[-1] in const.KEYWORDS['STRING_DELIMS'] and
+                  word[0] == word[-1]):
                 tokens.append(Token('STRING', word[1:-1]))
                 continue
-            elif word == '(':
+            # brackets
+            elif word == const.KEYWORDS['OPEN_PAREN']:
                 tokens.append(Token('LEFT_BRACKET'))
                 continue
-            elif word == ')':
+            elif word == const.KEYWORDS['CLOSE_PAREN']:
                 tokens.append(Token('RIGHT_BRACKET'))
                 continue
-            elif word in KEYWORDS["TYPE"]:
+            # types (int, float, str, none)
+            elif word in const.KEYWORDS["TYPE"].values():
                 tokens.append(Token("TYPE", word))
                 continue
-            elif word in KEYWORDS['BOOL_TYPES']:
+            # booltypes (true, false)
+            elif word in const.KEYWORDS['BOOL_TYPES'].values():
                 tokens.append(Token('BOOL', word))
-            elif word in KEYWORDS['NONE_TYPES']:
+            # nonetypes
+            elif word in const.KEYWORDS['NONE_TYPES'].values():
                 tokens.append(Token('NONETYPE', word))
+            # integers
             elif word.isdigit():
                 tokens.append(Token('INT', word))
+            # floats
             elif self.isfloat(word):
                 tokens.append(Token("FLOAT", word))
+            # other keywords
             elif word in keywordsinv:
                 tokens.append(Token(keywordsinv[word]))
                 continue
+            # identifiers (can contain errornous stuff but thats handled by the parser)
             else:
                 tokens.append(Token("ID", word))
         return tokens
 
 # for easier debugging
+# run python lexer.py --debug <file> to see the tokens
 if __name__ == '__main__':
     flag = sys.argv[1] if len(sys.argv) > 1 else None
     args = sys.argv[2:]
@@ -117,12 +158,6 @@ if __name__ == '__main__':
     code = None
     if flag == "--debug":
         code = "\n".join(open(file, 'r').read() for file in args)
-    elif flag == "--default":
-        code = '''
-new int var iablename is ((5 multiplied by 4) plus (1 plus 3))
-print iablename
-print"variablename"
-'''
 
     if code:
         print(f"code: \n{code}")

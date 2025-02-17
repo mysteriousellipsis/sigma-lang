@@ -1,7 +1,9 @@
+# system settings
 syserr = "\nthis is most likely a problem with sigma. open an issue at https://github.com/dimini171/sigma/issues/new"
+NOLOOKUP = {"TYPE", "BOOL_TYPES", "NONE_TYPES", "STRING_OPEN", "STRING_CLOSE"}
+
 KEYWORDS = {
     "TO": "to",
-    # important ntihngs
     "FILE_IDENT": "!>sigma",
     "FILE_EXT": ".sigma",
 
@@ -25,11 +27,12 @@ KEYWORDS = {
     "REASSIGNMENT_IDENT": "change",
 
     # math
-    "ADD": "plus",
-    "SUBTRACT": "minus",
-    "DIVIDE": "divided by",
-    "MULTIPLY": "multiplied by",
-    "MATH_OPERATORS": {"ADD", "SUBTRACT", "DIVIDE", "MULTIPLY"},
+    "MATH_OPERATORS": {
+            "ADD": "plus",
+            "SUBTRACT": "minus",
+            "DIVIDE": "divided by",
+            "MULTIPLY": "multiplied by"
+        },
 
     # logic
     "EQUALS": "equals",
@@ -37,17 +40,19 @@ KEYWORDS = {
     "LTE": "is less than or equal to",
     "GREATER": "is more than",
     "LESS": "is less than",
-    "NOT": "is not",
-    "LOGICAL_AND": "and",
-    "LOGICAL_OR": "or",
-    "LOGICAL_OPERATORS": {"LOGICAL_AND", "LOGICAL_OR", "NOT"},
+    "LOGICAL_OPERATORS": {
+            "LOGICAL_AND": "and",
+            "LOGICAL_OR": "or",
+            "NOT": "is not"
+        },
 
     # flow control
     "BREAK": "break",
     "CONTINUE": "continue",
     "PASS": "pass",
-    "GOTO": "goto",
-    "LABEL": "label",
+    # to be added
+    # "GOTO": "goto",
+    # "LABEL": "label",
 
     # i/o
     "INPUT": "receive",
@@ -62,22 +67,27 @@ KEYWORDS = {
     "IN": "in",
 
     # vartypes
-    "INTEGER": "int",
-    "FLOAT": "float",
-    "BOOL": "bool",
-    "NONETYPE": "none",
-    "STRING": "string",
-    "TYPE": {"int", "float", "bool", "none", "string"},
+    "TYPE": {
+        "INTEGER": "int",
+        "FLOAT": "float",
+        "BOOL": "bool",
+        "NONETYPE": "none",
+        "STRING": "string"
+    },
     "BOOL_TYPES": ["true", "false"],
     "NONE_TYPES": ["none", "nothing"],
-
-
-    # shell variables
-    "EXIT_SHELL_STATEMENT": ["quit", "exit", "stop", "q"],
-    "SHELL_PROMPT": ">> ",
 
     # try-except
     "TRY_OPEN": "try",
     "EXCEPT": "except",
-    "TRY_CLOSE": "yrt"
+    "TRY_CLOSE": "yrt",
+
+    # shell variables (shell mode to be added)
+    # "EXIT_SHELL_STATEMENT": ["quit", "exit", "stop", "q"],
+    # "SHELL_PROMPT": ">> ",
+    #
+    # standard sybols, dont change
+    "STRING_DELIMS": {"'", '"'},
+    "OPEN_PAREN": "(",
+    "CLOSE_PAREN": ")",
 }
