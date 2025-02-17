@@ -1,8 +1,11 @@
+from typing import Set, Dict, Union
+
 # system settings
 syserr = "\nthis is most likely a problem with sigma. open an issue at https://github.com/dimini171/sigma/issues/new"
-NOLOOKUP = {"TYPE", "BOOL_TYPES", "NONE_TYPES", "STRING_OPEN", "STRING_CLOSE"}
+NOLOOKUP: Set[str] = {"TYPE", "BOOL_TYPES", "NONE_TYPES", "STRING_OPEN", "STRING_CLOSE"}
+constexist: bool = True
 
-KEYWORDS = {
+KEYWORDS: Dict[str, Union[str, Dict[str, str], Set[str]]] = {
     "TO": "to",
     "FILE_IDENT": "!>sigma",
     "FILE_EXT": ".sigma",
@@ -74,8 +77,8 @@ KEYWORDS = {
         "NONETYPE": "none",
         "STRING": "string"
     },
-    "BOOL_TYPES": ["true", "false"],
-    "NONE_TYPES": ["none", "nothing"],
+    "BOOL_TYPES": {"true", "false"},
+    "NONE_TYPES": {"none", "nothing"},
 
     # try-except
     "TRY_OPEN": "try",

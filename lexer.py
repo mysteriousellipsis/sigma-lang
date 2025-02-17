@@ -1,14 +1,14 @@
 import re
 import sys
 import const
-from typing import Any, Dict, List, Optional, Pattern
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Pattern, cast
 
 '''
 lexer for the language
 tokenizes the input into tokens (duh) that the parser can understand.
 this part of the program removes noise like whitespace and comments
 '''
-
 
 # this chunk of code is a little confusing
 #
@@ -32,7 +32,7 @@ escapedkw: List[str] = [re.escape(kw) for kw in keywordsonly]
 kwpattern: str = r'\b(?:' + '|'.join(escapedkw) + r')\b' # changed this so that it matches keywords and ids only if they are not part of a larger word
 
 pattern: Pattern[str] = re.compile(fr'''
-            ({re.escape(const.KEYWORDS["COMMENT_OPEN"])}[\s\S]*?{re.escape(const.KEYWORDS["COMMENT_CLOSE"])}) |     # comments
+            ({re.escape(str(const.KEYWORDS["COMMENT_OPEN"]))}[\s\S]*?{re.escape(str(const.KEYWORDS["COMMENT_CLOSE"]))}) |     # comments
             ("[^"]*"|'[^']*') |    # strings (stuff between "" and '')
             ({kwpattern}) |        # stuff from const.py
             ([()]) |               # parenthesis
@@ -44,6 +44,7 @@ pattern: Pattern[str] = re.compile(fr'''
         re.VERBOSE | re.DOTALL
 )
 
+@dataclass()
 class Token:
     '''
     token data type
@@ -53,27 +54,24 @@ class Token:
         self.value: str = value
 
     def __repr__(self) -> str:
-        # defines what the token looks like when printed
+        '''defines what the token looks like when printed'''
         if self.value:
             return f"{self.type}:{self.value}"
         return f"{self.type}"
 
     def __eq__(self, other: Any) -> bool:
-        # defines how to compare tokens
+        '''defines how to compare tokens'''
         if not isinstance(other, Token):
             return False
         return self.type == other.type and self.value == other.value
 
 class Lexer:
-    '''
-    actual lexer
-    '''
+    '''lexer'''
     def __init__(self, text: str) -> None:
         self.text: str = text
         self.pos: int = 0
 
-        # finds all matches
-        # extracts the first non-empty group from each match (tuple)
+        # precompute regex pattern
         self.words: List[str] = [
             next(group for group in match if group)
             for match in pattern.findall(text)
@@ -125,14 +123,14 @@ class Lexer:
                 tokens.append(Token('RIGHT_BRACKET'))
                 continue
             # types (int, float, str, none)
-            elif word in const.KEYWORDS["TYPE"].values():
+            elif word in cast(Dict[str, str], const.KEYWORDS["TYPE"]).values():
                 tokens.append(Token("TYPE", word))
                 continue
             # booltypes (true, false)
-            elif word in const.KEYWORDS['BOOL_TYPES'].values():
+            elif word in const.KEYWORDS['BOOL_TYPES']:
                 tokens.append(Token('BOOL', word))
             # nonetypes
-            elif word in const.KEYWORDS['NONE_TYPES'].values():
+            elif word in const.KEYWORDS['NONE_TYPES']:
                 tokens.append(Token('NONETYPE', word))
             # integers
             elif word.isdigit():
