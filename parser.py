@@ -1,6 +1,6 @@
 import sys
 import const
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple, Union
 from lexer import Lexer, Token
 from const import KEYWORDS, syserr
 
@@ -11,6 +11,8 @@ each node is a dictionary to tell the evaluator how to execute the code
 
 Node = Dict[str, Any]
 AST = List[Node]
+CondBody = Union[List[Optional[Node]], str]
+EOF = Token("EOF", "EOF")
 
 class ParseError(Exception):
     '''
@@ -33,15 +35,17 @@ class Parser:
                     "EQUALS": 1, "GREATER": 1, "LESS": 1, "NOT": 1
                 }
 
-    def curr(self, pos: int = 0) -> Optional[Token]:
+    def curr(self) -> Token:
         '''
         returns the token at the current index
         '''
-        return self.tokens[self.pos+pos] if self.pos+pos < len(self.tokens) else None
+        return self.tokens[self.pos] if self.pos < len(self.tokens) else EOF
 
-    def peek(self) -> Optional[Token]:
-        '''returns the token at the next index'''
-        return self.curr(1)
+    def peek(self) -> Token:
+        '''
+        returns the token at the next index
+        '''
+        return self.tokens[self.pos+1] if self.pos+1 < len(self.tokens) else EOF
 
     def consume(self, expected: Optional[str] = None, errormsg: str = "", error: type = ParseError) -> Token:
         '''
@@ -50,8 +54,8 @@ class Parser:
         '''
         token = self.curr()
 
-        if not token:
-            raise error(f"unexpected end of input {syserr}")
+        if token.type == "EOF":
+            raise error("unexpected end of file")
 
         if expected and token.type != expected:
             if errormsg:
@@ -62,28 +66,32 @@ class Parser:
 
         return token
 
-    def parse(self) -> List[Dict]:
+    def parse(self) -> AST:
         '''
         entry point
         '''
-        ast = []
+        ast: AST = []
 
-        while self.curr():
-            ast.append(self.parseline())
+        while self.curr().type != "EOF":
+            parsed: Optional[Node] = self.parseline()
+            if parsed is not None:
+                ast.append(parsed)
 
         return ast
 
-    def parseline(self) -> Optional[dict]:
+    def parseline(self) -> Optional[Node]:
         '''
         parses a "line"
         '''
-        token = self.curr()
+        token: Token = self.curr()
 
         if not token:
             return None
 
         # parses tokens based on its type
         match token.type:
+            case "EOF":
+                raise SystemError(f"unexpected EOF{syserr}")
             case "NEW_VAR_IDENT":
                 return self.decl()
             case "IF_OPEN":
@@ -106,26 +114,39 @@ class Parser:
                 return None
             case "TRY_OPEN":
                 return self.tryexcept()
-            case "BREAK" | "CONTINUE" | "PASS":
+            case "BREAK" | "CONTINUE":
+                self.consume()
                 return {
                     "type": "flow",
                     "name": token.type.lower()
                 }
+            # warnings
+            case "VAR":
+                raise ParseError(f"unexpected token {KEYWORDS['NEW_VAR_IDENT']}\ndid you mean to declare a variable?")
             case _:
                 raise ParseError(f"unexpected token {token}{syserr}")
-
 
     def decl(self) -> Node:
         '''
         handles declaration of new variables
+        type: str
+        name: str
+        vartype: str
+        isconst: bool
+        value: Optional[Node]
         '''
         self.consume("NEW_VAR_IDENT", errormsg=f"expected {KEYWORDS['NEW_VAR_IDENT']}{syserr}", error=SystemError)
 
-        vartypetok = self.consume("TYPE", errormsg="expected a type declaration", error=SyntaxError)
-        vartype = vartypetok.value
+        try:
+            vartypetok: Token = self.consume("TYPE", errormsg="expected a type declaration", error=SyntaxError)
+        except SyntaxError as e:
+            if self.peek().type in {"CONST", "VAR"}:
+                raise SyntaxError(f"expected a type declaration after {KEYWORDS['NEW_VAR_IDENT']}\ndid you forget to declare a type?") from e
+            raise SyntaxError(f"expected a type declaration after {KEYWORDS['NEW_VAR_IDENT']}") from e
+        vartype: str = vartypetok.value
 
-        constvar = self.consume()
-        isconst = None
+        constvar: Token = self.consume()
+        isconst: bool = False
         # verifies if constexist is set to true
         if const.constexist:
             match constvar.type:
@@ -136,42 +157,44 @@ class Parser:
                 case _:
                     raise SyntaxError(f"expected {KEYWORDS['CONST']} or {KEYWORDS['VAR']} after {KEYWORDS['NEW_VAR_IDENT']}")
 
-        idtok = self.consume("ID", errormsg="expected a variable", error=SyntaxError)
-        varname = idtok.value
+        idtok: Token = self.consume("ID", errormsg="expected a variable", error=SyntaxError)
+        varname: str = idtok.value
 
-        value = None
-        if self.curr():
-            if self.curr().type == "ASSIGNMENT_OPERATOR":
-                self.consume("ASSIGNMENT_OPERATOR", errormsg=f"{KEYWORDS['ASSIGNMENT_OPERATOR']} expected", error=SyntaxError)
-                value = self.expr()
+        value: Optional[Node] = None
+        if self.curr().type == "ASSIGNMENT_OPERATOR":
+            self.consume("ASSIGNMENT_OPERATOR", errormsg=f"{KEYWORDS['ASSIGNMENT_OPERATOR']} expected", error=SyntaxError)
+            value = self.expr()
 
         return {
             "type": "declaration",
             "name": varname,
             "vartype": vartype,
-            "isconst": isconst if isconst else None,
+            "isconst": isconst,
             "value": value
         }
 
     def tryexcept(self) -> Node:
         '''
         parses try-except functions
+        type: str
+        try: CondBody
+        except: CondBody
         '''
         self.consume("TRY_OPEN", errormsg=f"expected {KEYWORDS['TRY_OPEN']}{syserr}", error=SystemError)
         self.consume("DO", errormsg=f"expected {KEYWORDS['DO']}", error=SyntaxError)
 
-        if self.curr() == "NEWLINE":
+        if self.curr().type == "NEWLINE":
             self.consume("NEWLINE", errormsg=f"expected a newline{syserr}", error=SystemError)
 
-        trybody = []
-        while self.curr() and self.curr().type != "EXCEPT":
+        trybody: CondBody = []
+        while self.curr().type != "EXCEPT":
             trybody.append(self.parseline())
 
         self.consume("EXCEPT", errormsg=f"expected {KEYWORDS['EXCEPT']}", error=SyntaxError)
         self.consume("DO", errormsg=f"expected {KEYWORDS['DO']}", error=SyntaxError)
 
-        exceptbody = []
-        while self.curr() and self.curr().type != "TRY_CLOSE":
+        exceptbody: CondBody = []
+        while self.curr().type != "TRY_CLOSE":
             exceptbody.append(self.parseline())
 
         self.consume("TRY_CLOSE", errormsg=f"expected {KEYWORDS['TRY_CLOSE']} to end try-except", error=SyntaxError)
@@ -183,37 +206,44 @@ class Parser:
         }
 
     def ifelse(self) -> Node:
-        '''parses if else'''
+        '''
+        parses if else
+        type: str
+        condition: Node
+        body: CondBody
+        elifs: List[Tuple[Node, CondBody]]
+        elsebody: CondBody
+        '''
         self.consume("IF_OPEN", errormsg=f"expected {KEYWORDS['IF_OPEN']}{syserr}", error=SystemError)
-        condition = self.evalcond()
+        condition: Node = self.evalcond()
         self.consume("THEN", errormsg=f"expected {KEYWORDS['THEN']} after {KEYWORDS['IF_OPEN']}", error=SyntaxError)
         self.consume("DO", errormsg=f"expected {KEYWORDS['DO']} after {KEYWORDS['THEN']}", error=SyntaxError)
 
         # gets the code that gets run in the if clause
-        body = []
-        while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
+        body: CondBody = []
+        while self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
             body.append(self.parseline())
 
-        elifs = []
-        elsebody = []
+        elifs: List[Tuple[Node, CondBody]] = []
+        elsebody: CondBody = []
 
         # gets the condition for the elif statement and the code that runs in the elif clause
-        while self.curr() and self.curr().type == "ELIF":
+        while self.curr().type == "ELIF":
             self.consume("ELIF", errormsg=f"expected {KEYWORDS['ELIF']}{syserr}", error=SystemError)
-            elifcond = self.evalcond()
+            elifcond: Node = self.evalcond()
             self.consume("THEN", errormsg=f"expected {KEYWORDS['THEN']} after {KEYWORDS['ELIF']}", error=SyntaxError)
             self.consume("DO", errormsg=f"expected {KEYWORDS['DO']} after {KEYWORDS['THEN']}", error=SyntaxError)
-            elifbody = []
-            while self.curr() and self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
+            elifbody: CondBody = []
+            while self.curr().type not in {"ELIF", "ELSE", "IF_CLOSE"}:
                 elifbody.append(self.parseline())
 
             elifs.append((elifcond, elifbody))
 
         # gets the code that gets run in the else clause
-        if self.curr() and self.curr().type == "ELSE":
+        if self.curr().type == "ELSE":
             self.consume("ELSE", errormsg=f"expected {KEYWORDS['ELSE']}{syserr}", error=SystemError)
             self.consume("DO", errormsg=f"expected {KEYWORDS['DO']} after {KEYWORDS['ELSE']}", error=SyntaxError)
-            while self.curr() and self.curr().type != "IF_CLOSE":
+            while self.curr().type != "IF_CLOSE":
                 elsebody.append(self.parseline())
 
         self.consume("IF_CLOSE", errormsg=f"expected {KEYWORDS['IF_CLOSE']} to end if statement", error=SyntaxError)
@@ -227,14 +257,19 @@ class Parser:
         }
 
     def whileloop(self) -> Node:
-        '''handles while loops'''
+        '''
+        handles while loops
+        type: str
+        condition: Node
+        body: CondBody
+        '''
         self.consume("WHILE_OPEN", errormsg=f"expected {KEYWORDS['WHILE_OPEN']}{syserr}", error=SystemError)
-        condition = self.expr()
+        condition: Node = self.expr()
         self.consume("DO", errormsg=f"expected {KEYWORDS['DO']} after {KEYWORDS['WHILE_OPEN']}", error=SyntaxError)
 
         # gets the code in the while loop
-        body = []
-        while self.curr() and self.curr().type != "WHILE_CLOSE":
+        body: CondBody = []
+        while self.curr().type != "WHILE_CLOSE":
             body.append(self.parseline())
 
         self.consume("WHILE_CLOSE", errormsg=f"expected {KEYWORDS['WHILE_CLOSE']} to end while loop", error=SyntaxError)
@@ -246,49 +281,56 @@ class Parser:
         }
 
     def output(self) -> Node:
-        '''handles print statements'''
+        '''
+        handles print statements
+        type: str
+        value: Node
+        newline: bool
+        '''
         self.consume("OUTPUT", errormsg=f"expected {KEYWORDS['OUTPUT']}{syserr}", error=SystemError)
         match self.curr().type:
             case "OUTPUT_NEWLINE":
                 self.consume("OUTPUT_NEWLINE", errormsg=f"expected {KEYWORDS['OUTPUT_NEWLINE']}{syserr}", error=SystemError)
-                value = self.expr()
-                return {
-                    "type": "output",
-                    "value": value,
-                    "newline": True
-                }
+                value: Node = self.expr()
+                newline: bool = True
             case _:
-                value = self.expr()
-                return {
-                    "type": "output",
-                    "value": value,
-                    "newline": False
-                }
+                value: Node = self.expr()
+                newline: bool = False
+
+        return {
+            "type": "output",
+            "value": value,
+            "newline": newline
+        }
 
     def receive(self) -> Node:
-        '''handles user input'''
+        '''
+        handles user input
+        type: str
+        target: Optional[str]
+        '''
         self.consume("INPUT", errormsg=f"expected {KEYWORDS['INPUT']}{syserr}", error=SystemError)
-        match self.curr().type:
-            case "TO":
-                self.consume("TO", errormsg=f"expected {KEYWORDS['TO']}{syserr}", error=SystemError)
-                target = self.consume("ID", errormsg="expected a variable", error=SyntaxError).value
+        target: Optional[str] = None
+        if self.curr().type == "TO":
+            self.consume("TO", errormsg=f"expected {KEYWORDS['TO']}{syserr}", error=SystemError)
+            target = self.consume("ID", errormsg="expected a variable", error=SyntaxError).value
 
-                return {
-                    "type": "input",
-                    "target": target
-                }
-            case _:
-                return {
-                    "type": "input",
-                    "target": None
-                }
+        return {
+            "type": "input",
+            "target": target
+        }
 
     def reassign(self) -> Node:
-        '''handles variable reassignment'''
+        '''
+        handles variable reassignment
+        type: str
+        name: str
+        value: Node
+        '''
         self.consume("REASSIGNMENT_IDENT", errormsg=f"expected {KEYWORDS['REASSIGNMENT_IDENT']}{syserr}", error=SystemError)
-        varname = self.consume("ID", errormsg="expected a variable name", error=SyntaxError).value
+        varname: str = self.consume("ID", errormsg="expected a variable name", error=SyntaxError).value
         self.consume("TO", errormsg=f"expected {KEYWORDS['TO']} after variable name", error=SyntaxError)
-        value = self.expr()
+        value: Node = self.expr()
 
         return {
             "type": "reassignment",
@@ -300,14 +342,18 @@ class Parser:
         '''
         parses conditionals and math
         ai helped a lot with this sob
+        type: str
+        op: str
+        left: Node
+        right: Node
         '''
-        left = self.exprhelper()
-        while self.curr() and self.curr().type not in {"RIGHT_BRACKET", "NEWLINE"} and self.priority(self.curr().type) > priority:
-            operator = self.consume()
-            right = self.expr(self.priority(operator.type))
+        left: Node = self.exprhelper()
+        while self.curr().type not in {"RIGHT_BRACKET", "NEWLINE", "DO", "THEN"} and self.priority(self.curr().type) > priority:
+            operator: str = self.consume().type
+            right: Node = self.expr(self.priority(operator))
             left = {
                 'type': 'operation',
-                'op': operator.type,
+                'op': operator,
                 'left': left,
                 'right': right
             }
@@ -317,13 +363,17 @@ class Parser:
         '''
         helper function for expr()
         basically just a bunch of if else statements
+        type: str
+        valtype: Optional[str]
+        value: Optional[str]
+        name: Optional[str]
         '''
         token = self.consume()
 
         match token.type:
             case  "LEFT_BRACKET":
                 expr = self.expr()
-                self.consume("RIGHT_BRACKET", errormsg=f"expected {KEYWORDS['RIGHT_BRACKET']}", error=SyntaxError)
+                self.consume("RIGHT_BRACKET", errormsg=f"expected {KEYWORDS['CLOSE_PAREN']}", error=SyntaxError)
                 return expr
             case _ if token.type in self.operatorpriority.keys():
                 expr = self.expr()
@@ -355,14 +405,20 @@ class Parser:
                 raise ParseError(f"invalid expression token {token.type}")
 
     def evalcond(self) -> Node:
-        '''evaluates a condition'''
-        node = self.expr()
-        while self.curr() and self.curr().type not in ['RIGHT_BRACKET', 'NEWLINE', 'THEN']:
-            operator = self.consume()
-            right = self.expr()
+        '''
+        evaluates a condition
+        type: str
+        op: str
+        left: Node
+        right: Node
+        '''
+        node: Node = self.expr()
+        while self.curr().type not in ['RIGHT_BRACKET', 'NEWLINE', 'THEN']:
+            operator: str = self.consume().type
+            right: Node = self.expr()
             node = {
                 'type': 'comparison',
-                'op': operator.type,
+                'op': operator,
                 'left': node,
                 'right': right
             }

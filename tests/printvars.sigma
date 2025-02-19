@@ -1,0 +1,8 @@
+let int var x be 10
+print line "testing printing variables"
+print line "printing bare variable"
+print x
+print line x
+print line "testing printing variable in string"
+print "x: $(x)"
+print line "x: $(x)"

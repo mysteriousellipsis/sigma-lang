@@ -1,28 +1,32 @@
 import sys
-from re import compile
+from re import compile, Pattern, Match
+from typing import Optional, Dict, Any, Union
 from lexer import Lexer
-from parser import Parser
+from parser import Parser, AST, Node
 from const import syserr
-from globals import variables, constants
+import globals
+
+EvalType = Union[int, float, str, bool, None]
 
 class Evaluator:
-    def __init__(self):
-        self.variables = variables
-        self.constants = constants
+    def __init__(self) -> None:
+        self.variables: Dict[str, Any] = globals.variables
+        self.constants: Dict[str, Any] = globals.constants
 
-    def evaluate(self, ast, mainloop=False):
+    def evaluate(self, ast: AST, mainloop: bool = False) -> Optional[str]:
         '''so that the loop isnt dead the instant theres a break or continue'''
         for node in ast:
-            result = self.evalnode(node)
+            result: Optional[str] = self.evalnode(node)
             if result in {"break", "continue"} and not mainloop:
                 return result
+        return None
 
-    def evalnode(self, node):
+    def evalnode(self, node: Node) -> Optional[str]:
         '''evaluates one node'''
         if not node:
-            return
+            return None
 
-        type_ = node.get("type")
+        type_: str = node["type"]
 
         match type_:
             case "if":
@@ -37,20 +41,20 @@ class Evaluator:
                 return self.whileloop(node)
             case "output":
                 return self.output(node)
-            # case "variable":
-            #     raise RuntimeError(f"")
             case "declaration":
                 return self.decl(node)
             case "reassignment":
                 return self.reassign(node)
+            case "variable":
+                return type_
             case _:
                 raise RuntimeError(f"unknown node type {type_} {syserr}")
 
-    def interpolate(self, s):
+    def interpolate(self, s: str) -> str:
         '''helper function to evaluate interpolated strings'''
-        pattern = compile(r'\$\((\w+)\)')
+        pattern: Pattern[str] = compile(r'\$\((\w+)\)')
 
-        def repl(match):
+        def repl(match: Match[str]) -> str:
             varname = match.group(1)
             if varname in self.variables:
                 return str(self.variables[varname][0])
@@ -59,29 +63,30 @@ class Evaluator:
 
         return pattern.sub(repl, s)
 
-    def flowcontrol(self, node):
+    def flowcontrol(self, node: Node) -> str:
         '''handles break, etc'''
         return node["name"]
 
-    def tryexcept(self, node):
+    def tryexcept(self, node: Node) -> Optional[str]:
         '''handles try-except functions'''
         try:
-            result = self.evaluate(node["try"])
+            result: Optional[str] = self.evaluate(node["try"])
             if result in {"break", "continue"}:
                 return result
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except:
-            result = self.evaluate(node["except"])
+            result: Optional[str] = self.evaluate(node["except"])
             if result in {"break", "continue"}:
                 return result
+        return None
 
-    def decl(self, node):
+    def decl(self, node: Node) -> Optional[str]:
         '''handles declaration of variables'''
-        varname = node["name"]
-        vartype = node["vartype"]
-        isconst = node["isconst"]
-        value = node["value"]
+        varname: str = node["name"]
+        vartype: str = node["vartype"]
+        isconst: bool = node["isconst"]
+        value: Optional[str] = node["value"]
 
         if varname in self.constants:
             raise RuntimeError(f"constant {varname} cannot be reassigned")
@@ -91,45 +96,50 @@ class Evaluator:
             self.variables[varname] = [evaledval, vartype]
             if isconst:
                 self.constants[varname] = vartype
+        return None
 
-    def ifelse(self, node):
+    def ifelse(self, node: Node) -> Optional[str]:
         '''handles if else statements'''
         condition = self.evalexpr(node["condition"])
         if condition:
-            result = self.evaluate(node["body"])
+            result: Optional[str] = self.evaluate(node["body"])
             if result in {"break", "continue"}:
                 return result
 
         for elifcond, elifbody in node["elifs"]:
             if self.evalexpr(elifcond):
-                result = self.evaluate(elifbody)
+                result: Optional[str] = self.evaluate(elifbody)
                 if result in {"break", "continue"}:
                     return result
 
-        result = self.evaluate(node["elsebody"])
+        result: Optional[str] = self.evaluate(node["elsebody"])
         if result in {"break", "continue"}:
             return result
+        return None
 
-    def whileloop(self, node):
+    def whileloop(self, node: Node) -> Optional[str]:
+        result: Optional[str] = None
         while self.evalexpr(node["condition"]):
             result = self.evaluate(node["body"])
             if result == "break":
                 return
             elif result == "continue":
                 continue
+        return result
 
-    def output(self, node):
+    def output(self, node: Node) -> None:
         '''handles print statements'''
-        value = self.evalexpr(node["value"])
-        newline = node["newline"]
+        value: EvalType = self.evalexpr(node["value"])
+        newline: bool = node["newline"]
         if newline:
             print(value)
         else:
             print(value, end="")
+        return None
 
-    def receive(self, node):
+    def receive(self, node: Node) -> None:
         '''handles input'''
-        target = node["target"]
+        target: Optional[str] = node["target"]
         if not target:
             input()
             return None
@@ -137,9 +147,9 @@ class Evaluator:
         if target not in self.variables:
             raise RuntimeError(f"undefined variable {target}")
 
-        usrinp = input()
+        usrinp: str = input()
 
-        exptype = self.variables[target][1]
+        exptype: str = self.variables[target][1]
 
         try:
             match exptype:
@@ -151,9 +161,10 @@ class Evaluator:
                     self.variables[target][0] = usrinp
         except ValueError:
             raise RuntimeError(f"input should be {exptype} but wrong type was provided")
+        return None
 
-    def reassign(self, node):
-        varname = node['name']
+    def reassign(self, node: Node) -> None:
+        varname: str = node['name']
 
         if varname in self.constants:
             raise RuntimeError(f"constant {varname} cannot be changed")
@@ -161,10 +172,11 @@ class Evaluator:
         if varname not in self.variables:
             raise RuntimeError(f"undefined variable: {varname}")
 
-        value = self.evalexpr(node["value"])
+        value: Optional[EvalType] = self.evalexpr(node["value"])
         self.variables[varname][0] = value
+        return None
 
-    def evalexpr(self, expr):
+    def evalexpr(self, expr: Node) -> EvalType:
         match expr["type"]:
             case "literal":
                 match expr["valtype"]:
@@ -184,30 +196,60 @@ class Evaluator:
                 left = self.evalexpr(expr["left"])
                 right = self.evalexpr(expr["right"])
                 op = expr["op"]
-
-                match op:
-                    case "GREATER":
-                        return left > right
-                    case "LESS":
-                        return left < right
-                    case "EQUALS":
+                if left is None or right is None:
+                    raise RuntimeError("cannot compare None")
+                elif isinstance(left, str) or isinstance(right, str):
+                    if op == "EQUALS":
                         return left == right
-                    case "GTE":
-                        return left >= right
-                    case "LTE":
-                        return left <= right
-                    case "NOT":
-                        return left != right
-                    case "ADD":
-                        return left + right
-                    case "MULTIPLY":
-                        return left * right
-                    case "SUBTRACT":
-                        return left - right
-                    case "DIVIDE":
-                        return left / right
-                    case _:
-                        raise RuntimeError(f"unknown comparison operator: {op}")
+                    raise RuntimeError("cannot compare strings")
+                elif isinstance(left, bool) and isinstance(right, bool):
+                    match op:
+                        case "GREATER":
+                            return left > right
+                        case "LESS":
+                            return left < right
+                        case "EQUALS":
+                            return left == right
+                        case "GTE":
+                            return left >= right
+                        case "LTE":
+                            return left <= right
+                        case "NOT":
+                            return left != right
+                        case "ADD":
+                            return left + right
+                        case "MULTIPLY":
+                            return left * right
+                        case "SUBTRACT":
+                            return left - right
+                        case "DIVIDE":
+                            return left / right
+                        case _:
+                            raise RuntimeError(f"unknown comparison operator: {op}")
+                elif isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                    match op:
+                        case "GREATER":
+                            return left > right
+                        case "LESS":
+                            return left < right
+                        case "EQUALS":
+                            return left == right
+                        case "GTE":
+                            return left >= right
+                        case "LTE":
+                            return left <= right
+                        case "NOT":
+                            return left != right
+                        case "ADD":
+                            return left + right
+                        case "MULTIPLY":
+                            return left * right
+                        case "SUBTRACT":
+                            return left - right
+                        case "DIVIDE":
+                            return left / right
+                        case _:
+                            raise RuntimeError(f"unknown comparison operator: {op}")
             case _:
                 raise RuntimeError(f"unknown expression type: {expr} {syserr}")
 

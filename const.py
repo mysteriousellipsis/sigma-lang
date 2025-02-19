@@ -52,7 +52,7 @@ KEYWORDS: Dict[str, Union[str, Dict[str, str], Set[str]]] = {
     # flow control
     "BREAK": "break",
     "CONTINUE": "continue",
-    "PASS": "pass",
+    # "PASS": "pass",
     # to be added
     # "GOTO": "goto",
     # "LABEL": "label",
