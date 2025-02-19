@@ -1,26 +1,37 @@
 import sys
-from lexer import Lexer
-from parser import Parser
+from typing import List
+from lexer import Lexer, Token
+from parser import Parser, AST
 from evaluator import Evaluator
 
-def validatepython():
-    '''python version check'''
+"""
+this is the file to run when actually using the interpreter
+combines all parts of the program and checks other stuff
+"""
+
+
+def validatepython() -> None:
+    """python version check"""
     minimum = (3, 10)
     if sys.version_info < minimum:
-        print(f"python version {'.'.join([str(n) for n in minimum])} or high required")
-        sys.exit()
+        print(
+            f"python version {'.'.join([str(n) for n in minimum])} or higher required"
+        )
+        sys.exit(1)
+    return None
 
-def validatefile(filename):
+
+def validatefile(filename: str) -> bool:
     try:
-        if filename.endswith('.sigma'):
+        if filename.endswith(".sigma"):
             return True
 
-        with open(filename, 'r') as file:
-            code = file.read()
+        with open(filename, "r") as file:
+            code: str = file.read()
 
-        firstline = code.split('\n', 1)
+        firstline: List[str] = code.split("\n", 1)
 
-        return firstline[0].strip() == '!>sigma'
+        return firstline[0].strip() == "!>sigma"
     except FileNotFoundError:
         print(f"file {filename} not found")
         return False
@@ -28,23 +39,26 @@ def validatefile(filename):
         print(f"error validating file: {e}")
         return False
 
-def runfile(filename):
+
+def runfile(filename: str) -> None:
     try:
-        with open(filename, 'r') as file:
-            code = file.read().strip()
-        lexer = Lexer(code)
-        tokens = lexer.tokenize()
-        parser = Parser(tokens)
-        ast = parser.parse()
-        evaluator = Evaluator()
+        with open(filename, "r") as file:
+            code: str = file.read().strip()
+        lexer: Lexer = Lexer(code)
+        tokens: List[Token] = lexer.tokenize()
+        parser: Parser = Parser(tokens)
+        ast: AST = parser.parse()
+        evaluator: Evaluator = Evaluator()
         evaluator.evaluate(ast, mainloop=True)
     except FileNotFoundError:
         print(f"error: {filename} not found")
     except KeyboardInterrupt:
         print("\nexecution interrupted by user")
         sys.exit(1)
+    return None
 
-def main():
+
+def main() -> None:
     if len(sys.argv) < 2:
         print("sigma intepreter")
         print("usage: sigma <file.sigma> [additional files]")
@@ -54,6 +68,7 @@ def main():
     for filename in sys.argv[1:]:
         if validatefile(filename):
             runfile(filename)
+
 
 if __name__ == "__main__":
     main()

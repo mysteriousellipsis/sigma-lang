@@ -8,13 +8,14 @@ import globals
 
 EvalType = Union[int, float, str, bool, None]
 
+
 class Evaluator:
     def __init__(self) -> None:
         self.variables: Dict[str, Any] = globals.variables
         self.constants: Dict[str, Any] = globals.constants
 
     def evaluate(self, ast: AST, mainloop: bool = False) -> Optional[str]:
-        '''so that the loop isnt dead the instant theres a break or continue'''
+        """so that the loop isnt dead the instant theres a break or continue"""
         for node in ast:
             result: Optional[str] = self.evalnode(node)
             if result in {"break", "continue"} and not mainloop:
@@ -22,7 +23,7 @@ class Evaluator:
         return None
 
     def evalnode(self, node: Node) -> Optional[str]:
-        '''evaluates one node'''
+        """evaluates one node"""
         if not node:
             return None
 
@@ -52,8 +53,8 @@ class Evaluator:
         return None
 
     def interpolate(self, s: str) -> str:
-        '''helper function to evaluate interpolated strings'''
-        pattern: Pattern[str] = compile(r'\$\((\w+)\)')
+        """helper function to evaluate interpolated strings"""
+        pattern: Pattern[str] = compile(r"\$\((\w+)\)")
 
         def repl(match: Match[str]) -> str:
             varname = match.group(1)
@@ -65,11 +66,12 @@ class Evaluator:
         return pattern.sub(repl, s)
 
     def flowcontrol(self, node: Node) -> str:
-        '''handles break, etc'''
-        return node["name"]
+        """handles break, etc"""
+        res: str = node["name"]
+        return res
 
     def tryexcept(self, node: Node) -> Optional[str]:
-        '''handles try-except functions'''
+        """handles try-except functions"""
         result: Optional[str] = None
         try:
             result = self.evaluate(node["try"])
@@ -84,7 +86,7 @@ class Evaluator:
         return None
 
     def decl(self, node: Node) -> Optional[str]:
-        '''handles declaration of variables'''
+        """handles declaration of variables"""
         varname: str = node["name"]
         vartype: str = node["vartype"]
         isconst: bool = node["isconst"]
@@ -101,7 +103,7 @@ class Evaluator:
         return None
 
     def ifelse(self, node: Node) -> Optional[str]:
-        '''handles if else statements'''
+        """handles if else statements"""
         condition = self.evalexpr(node["condition"])
         result: Optional[str] = None
         if condition:
@@ -131,7 +133,7 @@ class Evaluator:
         return result
 
     def output(self, node: Node) -> None:
-        '''handles print statements'''
+        """handles print statements"""
         value: EvalType = self.evalexpr(node["value"])
         newline: bool = node["newline"]
         if newline:
@@ -141,7 +143,7 @@ class Evaluator:
         return None
 
     def receive(self, node: Node) -> None:
-        '''handles input'''
+        """handles input"""
         target: Optional[str] = node["target"]
         if not target:
             input()
@@ -167,7 +169,7 @@ class Evaluator:
         return None
 
     def reassign(self, node: Node) -> None:
-        varname: str = node['name']
+        varname: str = node["name"]
 
         if varname in self.constants:
             raise RuntimeError(f"constant {varname} cannot be changed")
@@ -258,20 +260,21 @@ class Evaluator:
             case _:
                 raise RuntimeError(f"unknown expression type: {expr} {syserr}")
 
+
 # for easier debugging
-if __name__ == '__main__':
+if __name__ == "__main__":
     flag = sys.argv[1] if len(sys.argv) > 1 else None
     args = sys.argv[2:]
 
     code = None
     if flag == "--debug":
-        code = "\n".join(open(file, 'r').read() for file in args)
+        code = "\n".join(open(file, "r").read() for file in args)
     elif flag == "--default":
-        code = '''
+        code = """
 new int var iablename is ((5 multiplied by 4) plus (1 plus 3))
 print iablename
 print"variablename"
-'''
+"""
 
     if code:
         print(f"code: \n{code}")

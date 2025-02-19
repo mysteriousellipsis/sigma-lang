@@ -17,21 +17,13 @@ it attempts to be a very simple to understand and learn, especially for absolute
 head over to [syntax.md](https://github.com/dimini171/sigma/blob/v2/SYNTAX.md) to read more  
 
 ## progress on stuff
-### implemented
-comments  
-variables  
-conditionals  
-math  
-while loops  
-user input  
-output  
-interpolated strings  
-try-except loops  
-
 ### in progress
-break, pass, continue  
-arrays  
+pass  
 
 ### roadmap
+arrays  
 iterables  
 functions
+
+# contributing
+read [CONTRIBUTING.md](CONTRIBUTING.md)
