@@ -27,3 +27,6 @@ functions
 
 # contributing
 read [CONTRIBUTING.md](CONTRIBUTING.md)
+
+# building
+read [BUILDING.md](BUILDING.md)
