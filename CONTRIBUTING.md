@@ -5,6 +5,8 @@ feel free to refactor, propose/make new features or improve documentation
 please include a **clear description** of your changes in your pr or commit history  
 
 # note
+all required packages for you should be listed in [devrequirements.txt](devrequirements.txt)  
+run `pip install -r devrequirements.txt` to install all required packages  
 if you are doing a big big refactor or feature, please create an issue first and discuss it with us 
 
 we use **[mypy](https://mypy.readthedocs.io/)** to ensure static typing.  
