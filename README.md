@@ -10,9 +10,6 @@ check out [this document](INSTALLPYTHON.md)
 go to [the latest release](https://github.com/dimini171/sigma/releases/latest) and download the executable for your device
 run `./sigma <file>.sigma`
 
-## known issues
-variables cannot contain keywords, even if the word is completely different
-
 ## what is this??
 sigma lang was made for our final year computing coursework.  
 it attempts to be a very simple to understand and learn, especially for absolute beginners and people who want to pick up programming, but find it too confusing or difficult.
@@ -21,8 +18,11 @@ it attempts to be a very simple to understand and learn, especially for absolute
 head over to [syntax.md](https://github.com/dimini171/sigma/blob/v2/SYNTAX.md) to read more  
 
 ## progress on stuff
-### in progress
+### hotfixes
 pass  
+
+### in progress
+nothing for now  
 
 ### roadmap
 arrays  
