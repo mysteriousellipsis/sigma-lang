@@ -36,19 +36,20 @@ class Evaluator:
             case "flow":
                 return self.flowcontrol(node)
             case "input":
-                return self.receive(node)
+                self.receive(node)
             case "while":
                 return self.whileloop(node)
             case "output":
-                return self.output(node)
+                self.output(node)
             case "declaration":
                 return self.decl(node)
             case "reassignment":
-                return self.reassign(node)
+                self.reassign(node)
             case "variable":
                 return type_
             case _:
                 raise RuntimeError(f"unknown node type {type_} {syserr}")
+        return None
 
     def interpolate(self, s: str) -> str:
         '''helper function to evaluate interpolated strings'''
@@ -69,14 +70,15 @@ class Evaluator:
 
     def tryexcept(self, node: Node) -> Optional[str]:
         '''handles try-except functions'''
+        result: Optional[str] = None
         try:
-            result: Optional[str] = self.evaluate(node["try"])
+            result = self.evaluate(node["try"])
             if result in {"break", "continue"}:
                 return result
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except:
-            result: Optional[str] = self.evaluate(node["except"])
+            result = self.evaluate(node["except"])
             if result in {"break", "continue"}:
                 return result
         return None
@@ -86,7 +88,7 @@ class Evaluator:
         varname: str = node["name"]
         vartype: str = node["vartype"]
         isconst: bool = node["isconst"]
-        value: Optional[str] = node["value"]
+        value: Node = node["value"]
 
         if varname in self.constants:
             raise RuntimeError(f"constant {varname} cannot be reassigned")
@@ -101,18 +103,19 @@ class Evaluator:
     def ifelse(self, node: Node) -> Optional[str]:
         '''handles if else statements'''
         condition = self.evalexpr(node["condition"])
+        result: Optional[str] = None
         if condition:
-            result: Optional[str] = self.evaluate(node["body"])
+            result = self.evaluate(node["body"])
             if result in {"break", "continue"}:
                 return result
 
         for elifcond, elifbody in node["elifs"]:
             if self.evalexpr(elifcond):
-                result: Optional[str] = self.evaluate(elifbody)
+                result = self.evaluate(elifbody)
                 if result in {"break", "continue"}:
                     return result
 
-        result: Optional[str] = self.evaluate(node["elsebody"])
+        result = self.evaluate(node["elsebody"])
         if result in {"break", "continue"}:
             return result
         return None
@@ -122,7 +125,7 @@ class Evaluator:
         while self.evalexpr(node["condition"]):
             result = self.evaluate(node["body"])
             if result == "break":
-                return
+                return None
             elif result == "continue":
                 continue
         return result
@@ -187,11 +190,13 @@ class Evaluator:
                     case "STRING":
                         return self.interpolate(expr["value"])
                     case _:
-                        return expr["value"]
+                        val: EvalType = expr["value"]
+                        return val
             case "variable":
                 if expr["name"] in self.variables:
-                    return self.variables[expr["name"]][0]
-                raise RuntimeError(f"undefined variable {expr["name"]}")
+                    varval: EvalType = self.variables[expr["name"]][0]
+                    return varval
+                raise RuntimeError(f"undefined variable {expr['name']}")
             case "comparison" | "operation":
                 left = self.evalexpr(expr["left"])
                 right = self.evalexpr(expr["right"])

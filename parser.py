@@ -11,7 +11,7 @@ each node is a dictionary to tell the evaluator how to execute the code
 
 Node = Dict[str, Any]
 AST = List[Node]
-CondBody = Union[List[Optional[Node]], str]
+CondBody = List[Optional[Node]]
 EOF = Token("EOF", "EOF")
 
 class ParseError(Exception):
@@ -284,18 +284,19 @@ class Parser:
         '''
         handles print statements
         type: str
-        value: Node
+        value: Optional[Node]
         newline: bool
         '''
         self.consume("OUTPUT", errormsg=f"expected {KEYWORDS['OUTPUT']}{syserr}", error=SystemError)
+        newline: bool = False
+        value: Optional[Node] = None
         match self.curr().type:
             case "OUTPUT_NEWLINE":
                 self.consume("OUTPUT_NEWLINE", errormsg=f"expected {KEYWORDS['OUTPUT_NEWLINE']}{syserr}", error=SystemError)
-                value: Node = self.expr()
-                newline: bool = True
+                value = self.expr()
+                newline = True
             case _:
-                value: Node = self.expr()
-                newline: bool = False
+                value = self.expr()
 
         return {
             "type": "output",
