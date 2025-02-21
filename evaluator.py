@@ -80,6 +80,7 @@ class Evaluator:
         except KeyboardInterrupt:
             raise KeyboardInterrupt
         except:
+            # print(e)
             result = self.evaluate(node["except"])
             if result in {"break", "continue"}:
                 return result
